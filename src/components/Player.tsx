@@ -76,9 +76,10 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     // Default artist fallback
     return { ...found, artist: found.artist || "Loftwah" } as AlbumData;
   }, [albums, selectedSlug]);
-  const base = album ? `/${album.slug}` : "";
+  // Always fetch media via the Worker route that proxies R2
+  const base = album ? `/media/${album.slug}` : "";
   const coverUrl = album
-    ? `/${album.slug}/${encodeURIComponent(album.cover)}`
+    ? `/media/${album.slug}/${encodeURIComponent(album.cover)}`
     : null;
   const queue = useMemo(() => (album ? buildQueue(album) : []), [album]);
   const [index, setIndex] = useState(0);
