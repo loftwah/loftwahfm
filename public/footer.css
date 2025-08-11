@@ -1,7 +1,7 @@
 footer {
   padding: 2em 1em 6em 1em;
-  background: linear-gradient(rgba(229,233,240, 0.5), #fff) no-repeat;
-  color: rgb(96,115,159);
+  background: linear-gradient(rgba(229, 233, 240, 0.5), #fff) no-repeat;
+  color: rgb(96, 115, 159);
   text-align: center;
 }
 .social-links {
@@ -12,9 +12,8 @@ footer {
 }
 .social-links a {
   text-decoration: none;
-  color: rgb(96,115,159);
+  color: rgb(96, 115, 159);
 }
 .social-links a:hover {
-  color: rgb(34,41,57);
+  color: rgb(34, 41, 57);
 }
-

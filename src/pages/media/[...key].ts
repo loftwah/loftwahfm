@@ -17,7 +17,10 @@ function guessContentType(key: string): string {
   return "application/octet-stream";
 }
 
-function parseRangeHeader(rangeHeader: string, size: number): { start: number; end: number } | null {
+function parseRangeHeader(
+  rangeHeader: string,
+  size: number,
+): { start: number; end: number } | null {
   // Expected format: bytes=start-end
   if (!rangeHeader?.startsWith("bytes=")) return null;
   const spec = rangeHeader.replace("bytes=", "").trim();
@@ -50,21 +53,32 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
 
   const env: any = (locals as any)?.runtime?.env;
   const bucket: any = env?.MEDIA;
-  if (!bucket) return new Response("R2 binding not configured", { status: 500 });
+  if (!bucket)
+    return new Response("R2 binding not configured", { status: 500 });
 
   const head = await bucket.head(key);
   if (!head) return new Response("Not Found", { status: 404 });
 
   const size: number = head.size ?? 0;
-  const etag: string = head.httpEtag || head.etag || `W/"${size}-${head.uploaded?.getTime?.() ?? 0}"`;
-  const lastModified: string | undefined = (head.uploaded instanceof Date
-    ? head.uploaded.toUTCString()
-    : (head.uploaded ? new Date(head.uploaded).toUTCString() : undefined));
-  const contentType: string = head.httpMetadata?.contentType || guessContentType(key);
+  const etag: string =
+    head.httpEtag ||
+    head.etag ||
+    `W/"${size}-${head.uploaded?.getTime?.() ?? 0}"`;
+  const lastModified: string | undefined =
+    head.uploaded instanceof Date
+      ? head.uploaded.toUTCString()
+      : head.uploaded
+        ? new Date(head.uploaded).toUTCString()
+        : undefined;
+  const contentType: string =
+    head.httpMetadata?.contentType || guessContentType(key);
 
   // Conditional request via ETag
   const ifNoneMatch = request.headers.get("If-None-Match");
-  if (ifNoneMatch && ifNoneMatch.replace(/W\//, "") === etag.replace(/W\//, "")) {
+  if (
+    ifNoneMatch &&
+    ifNoneMatch.replace(/W\//, "") === etag.replace(/W\//, "")
+  ) {
     return new Response(null, {
       status: 304,
       headers: {
@@ -128,5 +142,3 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
     },
   });
 };
-
-

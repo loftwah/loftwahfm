@@ -2,7 +2,7 @@ header {
   margin: 0;
   padding: 0 1em;
   background: white;
-  box-shadow: 0 2px 8px rgba(15,18,25, 0.05);
+  box-shadow: 0 2px 8px rgba(15, 18, 25, 0.05);
 }
 h2 {
   margin: 0;
@@ -19,7 +19,7 @@ nav {
 }
 nav a {
   padding: 1em 0.5em;
-  color: rgb(15,18,25);
+  color: rgb(15, 18, 25);
   border-bottom: 4px solid transparent;
   text-decoration: none;
 }
@@ -36,4 +36,3 @@ nav a.active {
     display: none;
   }
 }
-

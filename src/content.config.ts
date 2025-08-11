@@ -24,16 +24,22 @@ const albums = defineCollection({
     year: z.number(),
     cover: z.string(),
     backCover: z.string().optional(),
-    tracks: z.array(z.object({
-      title: z.string(),
-      file: z.string(),
-      durationSec: z.number().optional(),
-    })),
-    videos: z.array(z.object({
-      title: z.string(),
-      file: z.string(),
-      poster: z.string().optional(),
-    })).optional(),
+    tracks: z.array(
+      z.object({
+        title: z.string(),
+        file: z.string(),
+        durationSec: z.number().optional(),
+      }),
+    ),
+    videos: z
+      .array(
+        z.object({
+          title: z.string(),
+          file: z.string(),
+          poster: z.string().optional(),
+        }),
+      )
+      .optional(),
     gallery: z.array(z.string()).optional(),
   }),
 });

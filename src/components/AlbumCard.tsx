@@ -24,14 +24,25 @@ export interface AlbumData {
   gallery?: string[];
 }
 
-export function AlbumCard({ album, onSelect }: { album: AlbumData; onSelect?: (slug: string) => void }) {
-  const [imgSrc, setImgSrc] = useState(`/${album.slug}/${encodeURIComponent(album.cover)}`);
+export function AlbumCard({
+  album,
+  onSelect,
+}: {
+  album: AlbumData;
+  onSelect?: (slug: string) => void;
+}) {
+  const [imgSrc, setImgSrc] = useState(
+    `/${album.slug}/${encodeURIComponent(album.cover)}`,
+  );
   return (
-    <button className="panel w-full text-left overflow-hidden btn !p-0 hover:bg-white/5" onClick={() => onSelect?.(album.slug)}>
+    <button
+      className="panel w-full text-left overflow-hidden btn !p-0 hover:bg-white/5"
+      onClick={() => onSelect?.(album.slug)}
+    >
       <div className="aspect-square w-full bg-black">
         <img
           src={imgSrc}
-          onError={() => setImgSrc('/blog-placeholder-1.jpg')}
+          onError={() => setImgSrc("/blog-placeholder-1.jpg")}
           alt={`${album.title} cover`}
           className="h-full w-full object-cover"
           loading="lazy"
@@ -42,13 +53,14 @@ export function AlbumCard({ album, onSelect }: { album: AlbumData; onSelect?: (s
           <h3 className="text-base font-semibold text-white">{album.title}</h3>
           <span className="text-xs text-white/60">{album.year}</span>
         </div>
-        <p className="text-sm text-white/80">{album.artist || 'Loftwah'}</p>
-        <p className="text-xs text-white/60">{album.tracks.length} tracks{album.videos?.length ? ` · ${album.videos.length} videos` : ""}</p>
+        <p className="text-sm text-white/80">{album.artist || "Loftwah"}</p>
+        <p className="text-xs text-white/60">
+          {album.tracks.length} tracks
+          {album.videos?.length ? ` · ${album.videos.length} videos` : ""}
+        </p>
       </div>
     </button>
   );
 }
 
 export default AlbumCard;
-
-

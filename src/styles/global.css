@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
-:root { color-scheme: light dark; }
+:root {
+  color-scheme: light dark;
+}
 
-html, body { height: 100%; }
+html,
+body {
+  height: 100%;
+}
 body {
   @apply bg-black text-white antialiased;
 }

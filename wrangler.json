@@ -8,7 +8,11 @@
     "binding": "ASSETS"
   },
   "r2_buckets": [
-    { "binding": "MEDIA", "bucket_name": "loftwahfm", "preview_bucket_name": "loftwahfm-dev" }
+    {
+      "binding": "MEDIA",
+      "bucket_name": "loftwahfm",
+      "preview_bucket_name": "loftwahfm-dev"
+    }
   ],
   "observability": {
     "enabled": true
