@@ -11,6 +11,7 @@ import {
   Volume2,
   Music2,
   Video as VideoIcon,
+  Disc3,
 } from "lucide-react";
 
 type QueueItem =
@@ -170,8 +171,12 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
       <div className="mx-auto max-w-4xl px-4">
         {/* Now Playing header row (compact) */}
         {album && current && (
-          <div className="mb-5 flex items-center gap-4">
-            <div className="size-20 border border-white bg-black flex-shrink-0">
+          <div className="mb-5">
+            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide opacity-70">
+              <Disc3 size={14} /> Now Playing
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="size-20 border border-white bg-black flex-shrink-0">
               {current.kind === "video" ? (
                 <img
                   src={coverFallback || coverUrl || ""}
@@ -187,13 +192,14 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
                   onError={() => setCoverFallback("/blog-placeholder-1.jpg")}
                 />
               )}
-            </div>
-            <div className="min-w-0">
-              <div className="truncate text-lg font-semibold">
-                {album.title}
               </div>
-              <div className="truncate text-sm opacity-80">
-                {current.title} · {album.artist}
+              <div className="min-w-0">
+                <div className="truncate text-lg font-semibold">
+                  {album.title}
+                </div>
+                <div className="truncate text-sm opacity-80">
+                  {current.title} · {album.artist}
+                </div>
               </div>
             </div>
           </div>
@@ -271,7 +277,17 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
                   <Music2 size={16} />
                 )}
                 <span className="flex-1 truncate text-left">{q.title}</span>
-                {"durationSec" in q && q.durationSec ? (
+                {i === index ? (
+                  isPlaying ? (
+                    <span className="inline-flex items-end gap-0.5" aria-label="Now playing">
+                      <span className="eq-bar" style={{ animationDelay: "0ms" }} />
+                      <span className="eq-bar" style={{ animationDelay: "150ms" }} />
+                      <span className="eq-bar" style={{ animationDelay: "300ms" }} />
+                    </span>
+                  ) : (
+                    <Play size={14} aria-label="Selected" />
+                  )
+                ) : "durationSec" in q && q.durationSec ? (
                   <span className="text-xs tabular-nums opacity-80">
                     {formatTime(q.durationSec)}
                   </span>
@@ -285,7 +301,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
       </div>
 
       {/* Bottom transport bar */}
-      <div className="player-bar sticky bottom-0 left-0 right-0 bg-black">
+      <div className="player-bar sticky bottom-0 left-0 right-0 bg-black/90 backdrop-blur supports-[backdrop-filter]:bg-black/70">
         <div className="panel p-3 mx-auto max-w-4xl mt-6">
           {/* Transport controls in 3-column grid for perfect centering */}
           <div className="grid grid-cols-3 items-center gap-4">

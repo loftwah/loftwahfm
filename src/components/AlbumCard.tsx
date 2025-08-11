@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Music2, Video as VideoIcon } from "lucide-react";
 
 export interface TrackItem {
   title: string;
@@ -54,9 +55,15 @@ export function AlbumCard({
           <span className="text-xs text-white/60">{album.year}</span>
         </div>
         <p className="text-sm text-white/80">{album.artist || "Loftwah"}</p>
-        <p className="text-xs text-white/60">
-          {album.tracks.length} tracks
-          {album.videos?.length ? ` · ${album.videos.length} videos` : ""}
+        <p className="text-xs text-white/60 flex items-center gap-3">
+          <span className="inline-flex items-center gap-1">
+            <Music2 size={12} /> {album.tracks.length}
+          </span>
+          {album.videos?.length ? (
+            <span className="inline-flex items-center gap-1">
+              <VideoIcon size={12} /> {album.videos.length}
+            </span>
+          ) : null}
         </p>
       </div>
     </button>
