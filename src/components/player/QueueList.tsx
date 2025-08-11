@@ -22,16 +22,23 @@ export function QueueList({
   onSelect,
 }: QueueListProps) {
   return (
-    <ol className="divide-y divide-white/40 border border-white/40 rounded-sm overflow-hidden select-none">
+    <ol
+      className="divide-y divide-white/40 border border-white/40 rounded-sm overflow-hidden select-none"
+      role="listbox"
+      aria-label="Track queue"
+    >
       {items.map((q, i) => (
         <li
           key={`${q.kind}:${q.file}`}
           className={`${i === activeIndex ? "bg-white text-black" : ""}`}
+          role="option"
+          aria-selected={i === activeIndex}
         >
           <button
             className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white hover:text-black transition-colors"
             onClick={() => onSelect(i)}
             title={q.kind === "video" ? "Video" : "Audio"}
+            aria-label={`${i + 1}. ${q.title} ${q.kind === "video" ? "video" : "audio"}`}
           >
             <span className="w-6 text-right tabular-nums text-xs opacity-70">
               {i + 1}

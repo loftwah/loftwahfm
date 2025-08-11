@@ -39,7 +39,11 @@ export function TransportControls(props: TransportControlsProps) {
   } = props;
 
   return (
-    <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 w-full select-none">
+    <div
+      className="grid grid-cols-[auto_1fr_auto] items-center gap-3 w-full select-none"
+      role="toolbar"
+      aria-label="Playback controls"
+    >
       {/* Left: shuffle - tighter */}
       <div className="flex items-center gap-2 justify-start">
         <button
@@ -48,6 +52,7 @@ export function TransportControls(props: TransportControlsProps) {
           onClick={onToggleShuffle}
           aria-pressed={shuffle}
           title="Shuffle"
+          aria-label={shuffle ? "Shuffle on" : "Shuffle off"}
         >
           <Shuffle size={20} strokeWidth={2.75} />
         </button>
@@ -59,7 +64,7 @@ export function TransportControls(props: TransportControlsProps) {
           className="control-btn"
           onClick={onPrev}
           title="Previous"
-          aria-label="Previous"
+          aria-label="Previous (P)"
         >
           <SkipBack size={20} strokeWidth={2.75} />
         </button>
@@ -68,7 +73,7 @@ export function TransportControls(props: TransportControlsProps) {
             className="control-btn primary"
             onClick={onPause}
             title="Pause"
-            aria-label="Pause"
+            aria-label="Pause (Space)"
           >
             <Pause size={24} strokeWidth={2.75} />
           </button>
@@ -77,7 +82,7 @@ export function TransportControls(props: TransportControlsProps) {
             className="control-btn primary"
             onClick={onPlay}
             title="Play"
-            aria-label="Play"
+            aria-label="Play (Space)"
           >
             <Play size={24} strokeWidth={2.75} />
           </button>
@@ -86,7 +91,7 @@ export function TransportControls(props: TransportControlsProps) {
           className="control-btn"
           onClick={onNext}
           title="Next"
-          aria-label="Next"
+          aria-label="Next (N)"
         >
           <SkipForward size={20} strokeWidth={2.75} />
         </button>
@@ -105,7 +110,13 @@ export function TransportControls(props: TransportControlsProps) {
                 ? "Repeat all"
                 : "Repeat off"
           }
-          aria-label="Repeat"
+          aria-label={
+            repeat === "one"
+              ? "Repeat one"
+              : repeat === "all"
+                ? "Repeat all"
+                : "Repeat off"
+          }
         >
           {repeat === "one" ? (
             <Repeat1 size={20} strokeWidth={2.75} />

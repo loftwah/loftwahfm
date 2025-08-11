@@ -17,6 +17,19 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Screen-reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Utilities */
 .panel {
   /* Square, solid black with crisp white border */
@@ -169,4 +182,14 @@ input[type="range"]::-moz-range-track {
 }
 .eq-bar:nth-child(3) {
   height: 10px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .eq-bar {
+    animation: none !important;
+  }
+  .control-btn:active {
+    transform: none;
+  }
 }

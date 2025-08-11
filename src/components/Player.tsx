@@ -86,6 +86,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     HTMLAudioElement &
       HTMLVideoElement & { pause: () => void; play: () => Promise<void> }
   >(null as any);
+  const liveRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setIndex(0);
@@ -157,10 +158,84 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   const src = current ? mediaUrl(base, current.file) : undefined;
   const [coverFallback, setCoverFallback] = useState<string | null>(null);
 
+  // Keyboard shortcuts: Space=play/pause, arrows seek, P/N previous/next, up/down volume
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      // Avoid hijacking when user types in inputs
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.getAttribute("contenteditable") === "true")
+      ) {
+        return;
+      }
+      if (e.code === "Space") {
+        e.preventDefault();
+        isPlaying ? doPause() : doPlay();
+      } else if (e.code === "ArrowRight") {
+        e.preventDefault();
+        seekTo((mediaRef.current?.currentTime || 0) + 5);
+      } else if (e.code === "ArrowLeft") {
+        e.preventDefault();
+        seekTo((mediaRef.current?.currentTime || 0) - 5);
+      } else if (e.code === "KeyP") {
+        e.preventDefault();
+        prev();
+      } else if (e.code === "KeyN") {
+        e.preventDefault();
+        next();
+      } else if (e.code === "ArrowUp") {
+        e.preventDefault();
+        setVolume((v) => Math.min(1, Number((v + 0.05).toFixed(2))));
+      } else if (e.code === "ArrowDown") {
+        e.preventDefault();
+        setVolume((v) => Math.max(0, Number((v - 0.05).toFixed(2))));
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isPlaying, prev, next, seekTo]);
+
+  // Live region announcements
+  const announce = (msg: string) => {
+    if (liveRef.current) {
+      liveRef.current.textContent = msg;
+    }
+  };
+
+  useEffect(() => {
+    if (album && current) {
+      announce(`${current.title} by ${album.artist}`);
+    }
+  }, [album?.slug, current?.file]);
+
+  useEffect(() => {
+    announce(`Shuffle ${shuffle ? "on" : "off"}`);
+  }, [shuffle]);
+
+  useEffect(() => {
+    announce(
+      repeat === "one"
+        ? "Repeat one"
+        : repeat === "all"
+          ? "Repeat all"
+          : "Repeat off",
+    );
+  }, [repeat]);
+
   return (
     <div className="">
       {/* Main content: queue left, now playing right */}
       <div className="mx-auto max-w-4xl px-4">
+        {/* Live region for screen readers */}
+        <div
+          ref={liveRef}
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+        ></div>
         {/* Now Playing header row (compact) */}
         {album && current && (
           <NowPlaying
@@ -186,6 +261,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
               }
               onEnded={onEnded}
               playsInline
+              aria-label="Video player"
             />
           </div>
         )}
@@ -202,6 +278,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
               setDuration(mediaRef.current?.duration || 0)
             }
             onEnded={onEnded}
+            aria-label="Audio player"
           />
         )}
 

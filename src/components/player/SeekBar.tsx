@@ -8,7 +8,11 @@ interface SeekBarProps {
 
 export function SeekBar({ currentTime, duration, onSeek }: SeekBarProps) {
   return (
-    <div className="mt-3 flex items-center gap-3 select-none">
+    <div
+      className="mt-3 flex items-center gap-3 select-none"
+      role="group"
+      aria-label="Seek"
+    >
       <span className="text-xs text-white tabular-nums">
         {formatTime(currentTime)}
       </span>
@@ -20,7 +24,10 @@ export function SeekBar({ currentTime, duration, onSeek }: SeekBarProps) {
         step={0.1}
         value={Number.isFinite(currentTime) ? currentTime : 0}
         onChange={(e) => onSeek(Number(e.target.value))}
-        aria-label="Seek"
+        aria-valuemin={0}
+        aria-valuemax={Math.max(0, duration || 0)}
+        aria-valuenow={Number.isFinite(currentTime) ? currentTime : 0}
+        aria-label="Seek position"
       />
       <span className="text-xs text-white tabular-nums">
         {formatTime(duration)}
