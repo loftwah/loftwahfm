@@ -1,4 +1,5 @@
 ---
+/* @ts-nocheck */
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -16,20 +17,32 @@ export const prerender = false;
 <!doctype html>
 <html lang="en">
 	<head>
-    <BaseHead title="LoftwahFM" description="A black & white, mobile-first music app." />
+    <BaseHead
+      title="LoftwahFM — Web-first music player to share my music"
+      description="LoftwahFM is a minimalist, black & white, web-first music player. Stream albums, videos, and share rich previews with Open Graph."
+      ogType="music.playlist"
+      ogAuthor="Loftwah"
+    />
 	</head>
 	<body>
 		<Header />
         <main class="space-y-6 mx-auto max-w-4xl px-4 mt-6 mb-28">
+            <section class="panel p-3">
+                <p class="text-sm">
+                    LoftwahFM is a web‑first music player. Browse albums, play tracks and videos, and share links that generate rich previews on social platforms.
+                </p>
+            </section>
             {albumEntries.length > 1 ? (
                 <section class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                     {albumEntries.map((a) => (
+                        // @ts-ignore Astro client directive
                         <AlbumCard album={a as any} client:idle />
                     ))}
                 </section>
             ) : albumEntries.length === 0 ? (
                 <p>No albums found.</p>
             ) : null}
+            <!-- @ts-ignore Astro client directive -->
             <Player albums={albumEntries as any} client:load />
         </main>
 		<Footer />

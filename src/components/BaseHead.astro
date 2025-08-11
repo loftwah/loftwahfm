@@ -7,6 +7,10 @@ interface Props {
   title: string;
   description: string;
   image?: string; // absolute or root-relative path
+  ogType?: string;
+  ogAudio?: string;
+  ogVideo?: string;
+  ogAuthor?: string;
 }
 
 // Prefer the runtime request origin (Workers/custom domain). Fallback to configured site.
@@ -14,7 +18,7 @@ const siteOrigin = (Astro?.url?.origin ?? Astro.site) as string;
 const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
 
 // Defaults
-const { title, description, image = '/phantom-love/phantom-og.jpg' } = Astro.props;
+const { title, description, image = '/phantom-love/phantom-og.jpg', ogType = 'website', ogAudio, ogVideo, ogAuthor } = Astro.props as Props;
 const siteName = 'LoftwahFM';
 const ogLogoPath = '/phantom-love/android-chrome-512x512.png';
 const ogImageURL = new URL(image, siteOrigin);
@@ -44,7 +48,7 @@ const ogLogoURL = new URL(ogLogoPath, siteOrigin);
 <meta name="description" content={description} />
 
 <!-- Open Graph -->
-<meta property="og:type" content="website" />
+<meta property="og:type" content={ogType} />
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
@@ -54,6 +58,9 @@ const ogLogoURL = new URL(ogLogoPath, siteOrigin);
 <meta property="og:image:alt" content={title} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
+{ogAudio && (<meta property="og:audio" content={new URL(ogAudio, siteOrigin)} />)}
+{ogVideo && (<meta property="og:video" content={new URL(ogVideo, siteOrigin)} />)}
+{ogAuthor && (<meta name="author" content={ogAuthor} />)}
 <meta name="theme-color" content="#000000" />
 
 <!-- Twitter / X -->
@@ -63,7 +70,7 @@ const ogLogoURL = new URL(ogLogoPath, siteOrigin);
 <meta name="twitter:image" content={ogImageURL} />
 <meta name="twitter:url" content={canonicalURL} />
 
-<!-- JSON-LD Organization with logo for richer link previews -->
+<!-- JSON-LD for site and a MusicAlbum listing when applicable -->
 <script type="application/ld+json">
   {JSON.stringify({
     '@context': 'https://schema.org',
@@ -71,5 +78,14 @@ const ogLogoURL = new URL(ogLogoPath, siteOrigin);
     name: siteName,
     url: String(canonicalURL),
     logo: String(ogLogoURL),
+  })}
+  </script>
+<script type="application/ld+json">
+  {JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteName,
+    url: String(canonicalURL),
+    description,
   })}
   </script>

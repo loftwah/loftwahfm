@@ -12,14 +12,32 @@ body {
   @apply bg-black text-white antialiased;
 }
 
+/* Safe-area support for iOS */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Screen-reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Utilities */
 .panel {
   /* Square, solid black with crisp white border */
-  @apply border border-white bg-black;
+  @apply border-2 border-white bg-black;
 }
 .btn {
   /* Square, high-contrast buttons */
-  @apply border border-white px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply border-2 border-white px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed;
   background: black;
   color: white;
 }
@@ -34,6 +52,7 @@ body {
 /* Player specific helpers */
 .player-bar {
   @apply border-t border-white;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 .btn-square {
   /* Fixed square controls */
@@ -45,16 +64,25 @@ body {
 
 /* Music-player specific controls */
 .control-btn {
-  @apply grid place-items-center rounded-full border border-white bg-black text-white transition-colors;
-  width: 2.75rem;
-  height: 2.75rem;
+  @apply grid place-items-center rounded-full border-2 border-white bg-black text-white transition-transform transition-colors outline-none;
+  width: 3rem; /* larger tap target on mobile */
+  height: 3rem;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  border-width: 3px; /* make outlines feel bolder on high-DPI */
 }
 .control-btn:hover {
   @apply bg-white text-black;
 }
+.control-btn:active {
+  transform: scale(0.96);
+}
+.control-btn:focus-visible {
+  @apply ring-2 ring-white ring-offset-2 ring-offset-black;
+}
 .control-btn.primary {
-  width: 3.25rem;
-  height: 3.25rem;
+  width: 3.5rem;
+  height: 3.5rem;
 }
 /* Clear on/off state */
 .control-btn[data-active="true"] {
@@ -65,7 +93,7 @@ body {
 }
 
 .queue-item {
-  @apply flex items-center gap-2 justify-between border border-white rounded-sm px-3 py-2 text-left hover:bg-white hover:text-black transition-colors;
+  @apply flex items-center gap-2 justify-between border-2 border-white rounded-sm px-3 py-2 text-left hover:bg-white hover:text-black transition-colors;
 }
 
 /* Album selector pills */
@@ -84,29 +112,62 @@ input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 2px;
+  height: 4px;
   background: white;
   outline: none;
+}
+/* iOS Safari needs explicit track styling */
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  background: white;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   background: white;
   border: 1px solid black;
 }
 input[type="range"]::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   background: white;
   border: 1px solid black;
+}
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: white;
+}
+
+/* Thicken icon strokes within circular controls */
+.control-btn svg {
+  stroke-width: 2.75;
+}
+
+@media (max-width: 480px) {
+  .control-btn {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+  .control-btn.primary {
+    width: 3.75rem;
+    height: 3.75rem;
+  }
+  input[type="range"] {
+    height: 4px;
+  }
 }
 
 /* Equalizer animation for the now-playing indicator */
 @keyframes eq-bounce {
-  0%, 100% { transform: scaleY(0.3); }
-  50% { transform: scaleY(1); }
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
 }
 .eq-bar {
   width: 3px;
@@ -116,5 +177,19 @@ input[type="range"]::-moz-range-thumb {
   transform-origin: bottom;
   animation: eq-bounce 1s infinite ease-in-out;
 }
-.eq-bar:nth-child(2) { height: 8px; }
-.eq-bar:nth-child(3) { height: 10px; }
+.eq-bar:nth-child(2) {
+  height: 8px;
+}
+.eq-bar:nth-child(3) {
+  height: 10px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .eq-bar {
+    animation: none !important;
+  }
+  .control-btn:active {
+    transform: none;
+  }
+}
