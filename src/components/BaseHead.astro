@@ -9,14 +9,16 @@ interface Props {
   image?: string; // absolute or root-relative path
 }
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+// Prefer the runtime request origin (Workers/custom domain). Fallback to configured site.
+const siteOrigin = (Astro?.url?.origin ?? Astro.site) as string;
+const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
 
 // Defaults
 const { title, description, image = '/phantom-love/phantom-og.jpg' } = Astro.props;
 const siteName = 'LoftwahFM';
 const ogLogoPath = '/phantom-love/android-chrome-512x512.png';
-const ogImageURL = new URL(image, Astro.site);
-const ogLogoURL = new URL(ogLogoPath, Astro.site);
+const ogImageURL = new URL(image, siteOrigin);
+const ogLogoURL = new URL(ogLogoPath, siteOrigin);
 ---
 
 <!-- Global Metadata -->
