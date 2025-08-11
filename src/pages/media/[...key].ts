@@ -48,16 +48,18 @@ function parseRangeHeader(
 export const GET: APIRoute = async ({ params, request, locals }) => {
   const keyParam = params.key as string | undefined;
   if (!keyParam) return new Response("Not Found", { status: 404 });
-  // Prevent directory traversal
-  const key = keyParam.replace(/^\/+/, "");
+  // Normalize and defensively decode percent-encoding
+  const rawKey = keyParam.replace(/^\/+/, "");
+  const decodedKey = safeDecodeURIComponent(rawKey);
 
   const env: any = (locals as any)?.runtime?.env;
-  const bucket: any = env?.MEDIA;
+  const bucket: R2Bucket | undefined = (env as any)?.MEDIA as any;
   if (!bucket)
     return new Response("R2 binding not configured", { status: 500 });
 
-  const head = await bucket.head(key);
-  if (!head) return new Response("Not Found", { status: 404 });
+  const resolved = await resolveExistingKey(bucket, decodedKey);
+  if (!resolved) return new Response("Not Found", { status: 404 });
+  const { key, head } = resolved;
 
   const size: number = head.size ?? 0;
   const etag: string =
@@ -142,3 +144,38 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
     },
   });
 };
+
+function safeDecodeURIComponent(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+async function resolveExistingKey(
+  bucket: R2Bucket,
+  desiredKey: string,
+): Promise<{ key: string; head: R2Object } | null> {
+  // Try several key variants to be resilient to prefix differences between environments
+  const candidates: string[] = [];
+  const noLead = desiredKey.replace(/^\/+/, "");
+  const withoutMedia = noLead.replace(/^media\//, "");
+
+  // 1) exact (decoded) path after /media/
+  candidates.push(noLead);
+  // 2) with media/ prefix
+  candidates.push(`media/${withoutMedia}`);
+  // 3) stripped media/ if present
+  if (noLead.startsWith("media/")) candidates.push(withoutMedia);
+
+  for (const candidate of dedupe(candidates)) {
+    const head = await bucket.head(candidate);
+    if (head) return { key: candidate, head };
+  }
+  return null;
+}
+
+function dedupe(values: string[]): string[] {
+  return Array.from(new Set(values.filter(Boolean)));
+}
