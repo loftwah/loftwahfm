@@ -8,6 +8,9 @@ import { getCollection } from 'astro:content';
 
 const albums = await getCollection('albums');
 const albumEntries = albums.map((a) => ({ id: a.id, ...a.data }));
+
+// Force SSR so OG tags are built from the actual request origin (Workers/preview)
+export const prerender = false;
 ---
 
 <!doctype html>
