@@ -110,9 +110,53 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   return (
     <div className="">
       {/* Main content: queue left, now playing right */}
-      <div className="mx-auto max-w-5xl px-4">
+      <div className="mx-auto max-w-4xl px-4">
+        {/* Now Playing header row (compact) */}
+        {album && current && (
+          <div className="mb-5 flex items-center gap-4">
+            <div className="size-20 border border-white bg-black flex-shrink-0">
+              {current.kind === "video" ? (
+                <img src={coverFallback || coverUrl || ''} alt={album.title} className="h-full w-full object-cover" onError={() => setCoverFallback('/blog-placeholder-1.jpg')} />
+              ) : (
+                <img src={coverFallback || coverUrl || ''} alt={album.title} className="h-full w-full object-cover" onError={() => setCoverFallback('/blog-placeholder-1.jpg')} />
+              )}
+            </div>
+            <div className="min-w-0">
+              <div className="truncate text-lg font-semibold">{album.title}</div>
+              <div className="truncate text-sm opacity-80">{current.title} · {album.artist}</div>
+            </div>
+          </div>
+        )}
+
+        {/* If video, show the player above the list */}
+        {current?.kind === "video" && (
+          <div className="mb-3">
+            <video
+              ref={mediaRef as any}
+              src={src}
+              className="w-full max-h-[40vh] bg-black"
+              controls={false}
+              onTimeUpdate={() => setCurrentTime(mediaRef.current?.currentTime || 0)}
+              onLoadedMetadata={() => setDuration(mediaRef.current?.duration || 0)}
+              onEnded={onEnded}
+              playsInline
+            />
+          </div>
+        )}
+
+        {/* For audio keep a hidden audio element */}
+        {current?.kind !== "video" && (
+          <audio
+            ref={mediaRef as any}
+            src={src}
+            onTimeUpdate={() => setCurrentTime(mediaRef.current?.currentTime || 0)}
+            onLoadedMetadata={() => setDuration(mediaRef.current?.duration || 0)}
+            onEnded={onEnded}
+          />
+        )}
+
         {/* Album selector (compact pills) */}
-        <div className="flex flex-wrap gap-2 pb-3">
+        <div className="flex flex-wrap gap-2 pb-4">
           {albums.map((a) => (
             <button
               key={a.slug}
@@ -123,89 +167,37 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
             </button>
           ))}
         </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {/* Queue list */}
-          <div className="md:col-span-2">
-            <ol className="space-y-2">
-              {queue.map((q, i) => (
-                <li key={`${q.kind}:${q.file}`}>
-                  <button
-                    className={`w-full flex items-center gap-3 border border-white px-3 py-2 hover:bg-white hover:text-black transition-colors ${i === index ? "!bg-white !text-black" : ""}`}
-                    onClick={() => setIndex(i)}
-                    title={q.kind === "video" ? "Video" : "Audio"}
-                  >
-                    <span className="w-6 text-right tabular-nums text-xs">{i + 1}</span>
-                    {q.kind === "video" ? <VideoIcon size={16} /> : <Music2 size={16} />}
-                    <span className="flex-1 truncate text-left">{q.title}</span>
-                    {"durationSec" in q && q.durationSec ? (
-                      <span className="text-xs tabular-nums opacity-80">{formatTime(q.durationSec)}</span>
-                    ) : (
-                      <span className="text-xs opacity-50"> </span>
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ol>
-          </div>
-
-          {/* Now playing panel */}
-          <div>
-            <div className="panel p-3">
-              {/* Media element & artwork/video */}
-              <div className="mb-3">
-                {current?.kind === "video" ? (
-                  <video
-                    ref={mediaRef as any}
-                    src={src}
-                    className="w-full bg-black"
-                    controls={false}
-                    onTimeUpdate={() => setCurrentTime(mediaRef.current?.currentTime || 0)}
-                    onLoadedMetadata={() => setDuration(mediaRef.current?.duration || 0)}
-                    onEnded={onEnded}
-                    playsInline
-                  />
+        
+        {/* Queue list (one column) */}
+        <ol className="divide-y divide-white/40 border border-white/40 rounded-sm overflow-hidden">
+          {queue.map((q, i) => (
+            <li key={`${q.kind}:${q.file}`} className={`${i === index ? 'bg-white text-black' : ''}`}>
+              <button
+                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white hover:text-black transition-colors`}
+                onClick={() => { setIndex(i); if (!isPlaying) doPlay(); }}
+                title={q.kind === "video" ? "Video" : "Audio"}
+              >
+                <span className="w-6 text-right tabular-nums text-xs opacity-70">{i + 1}</span>
+                {q.kind === "video" ? <VideoIcon size={16} /> : <Music2 size={16} />}
+                <span className="flex-1 truncate text-left">{q.title}</span>
+                {"durationSec" in q && q.durationSec ? (
+                  <span className="text-xs tabular-nums opacity-80">{formatTime(q.durationSec)}</span>
                 ) : (
-                  <>
-                    <audio
-                      ref={mediaRef as any}
-                      src={src}
-                      onTimeUpdate={() => setCurrentTime(mediaRef.current?.currentTime || 0)}
-                      onLoadedMetadata={() => setDuration(mediaRef.current?.duration || 0)}
-                      onEnded={onEnded}
-                    />
-                    <div className="aspect-square w-full border border-white bg-black">
-                      {album && (
-                        <img
-                          src={coverFallback || coverUrl || ''}
-                          alt={album.title}
-                          className="h-full w-full object-cover"
-                          onError={() => setCoverFallback('/blog-placeholder-1.jpg')}
-                        />
-                      )}
-                    </div>
-                  </>
+                  <span className="text-xs opacity-50"> </span>
                 )}
-              </div>
-
-              {album && current && (
-                <div className="space-y-1">
-                  <div className="truncate font-semibold">{album.title}</div>
-                  <div className="truncate text-sm opacity-80">{current.title} · {album.artist}</div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+              </button>
+            </li>
+          ))}
+        </ol>
       </div>
 
       {/* Bottom transport bar */}
       <div className="player-bar sticky bottom-0 left-0 right-0 bg-black">
-        <div className="panel p-4 mx-auto max-w-5xl">
-          {/* Transport controls */}
-          <div className="flex items-center justify-between gap-4">
+        <div className="panel p-3 mx-auto max-w-4xl mt-6">
+          {/* Transport controls in 3-column grid for perfect centering */}
+          <div className="grid grid-cols-3 items-center gap-4">
           {/* Left: shuffle */}
-          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <button
                 className="control-btn"
                 data-active={shuffle}
@@ -218,7 +210,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
           </div>
 
         	{/* Center: prev / play / next */}
-          <div className="flex items-center justify-center gap-3 flex-1">
+            <div className="flex items-center justify-center gap-5">
             <button className="control-btn" onClick={prev} title="Previous" aria-label="Previous">
               <SkipBack size={18} />
             </button>
@@ -237,7 +229,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
           </div>
 
           {/* Right: repeat + volume */}
-          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-end gap-2">
               <button
                 className="control-btn"
                 data-active={repeat !== "none"}
@@ -247,15 +239,15 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
             >
                 {repeat === "one" ? <Repeat1 size={18} /> : <Repeat size={18} />}
             </button>
-            <div className="ml-2 hidden sm:flex items-center gap-2">
+               <div className="ml-2 hidden sm:flex items-center gap-2">
                 <span className="text-xs text-white flex items-center gap-1"><Volume2 size={16} /> VOL</span>
-              <input className="w-28" type="range" min={0} max={1} step={0.01} value={volume} onChange={(e) => setVolume(Number(e.target.value))} />
+                 <input className="w-32" type="range" min={0} max={1} step={0.01} value={volume} onChange={(e) => setVolume(Number(e.target.value))} />
             </div>
           </div>
         </div>
 
         {/* Seek */}
-        <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex items-center gap-3">
           <span className="text-xs text-white tabular-nums">{formatTime(currentTime)}</span>
           <input
             className="flex-1"

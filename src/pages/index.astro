@@ -17,17 +17,16 @@ const albumEntries = albums.map((a) => ({ id: a.id, ...a.data }));
 	</head>
 	<body>
 		<Header />
-        <main class="space-y-4 mx-auto max-w-5xl px-4">
-            <h1 class="text-2xl font-bold">LoftwahFM</h1>
-            {albumEntries.length > 0 ? (
+        <main class="space-y-6 mx-auto max-w-4xl px-4 mt-6 mb-28">
+            {albumEntries.length > 1 ? (
                 <section class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                     {albumEntries.map((a) => (
                         <AlbumCard album={a as any} client:idle />
                     ))}
                 </section>
-            ) : (
+            ) : albumEntries.length === 0 ? (
                 <p>No albums found.</p>
-            )}
+            ) : null}
             <Player albums={albumEntries as any} client:load />
         </main>
 		<Footer />
