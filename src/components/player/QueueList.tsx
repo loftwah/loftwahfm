@@ -22,7 +22,7 @@ export function QueueList({
   onSelect,
 }: QueueListProps) {
   return (
-    <ol className="divide-y divide-white/40 border border-white/40 rounded-sm overflow-hidden">
+    <ol className="divide-y divide-white/40 border border-white/40 rounded-sm overflow-hidden select-none">
       {items.map((q, i) => (
         <li
           key={`${q.kind}:${q.file}`}
@@ -37,9 +37,9 @@ export function QueueList({
               {i + 1}
             </span>
             {q.kind === "video" ? (
-              <VideoIcon size={16} />
+              <VideoIcon size={18} strokeWidth={2.5} />
             ) : (
-              <Music2 size={16} />
+              <Music2 size={18} strokeWidth={2.5} />
             )}
             <span className="flex-1 truncate text-left">{q.title}</span>
             {i === activeIndex ? (
@@ -59,7 +59,7 @@ export function QueueList({
                   />
                 </span>
               ) : (
-                <Play size={14} aria-label="Selected" />
+                <Play size={16} strokeWidth={2.5} aria-label="Selected" />
               )
             ) : q.durationSec ? (
               <span className="text-xs tabular-nums opacity-80">

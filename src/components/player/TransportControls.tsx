@@ -39,9 +39,9 @@ export function TransportControls(props: TransportControlsProps) {
   } = props;
 
   return (
-    <div className="grid grid-cols-3 items-center gap-4">
-      {/* Left: shuffle */}
-      <div className="flex items-center gap-2">
+    <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 w-full select-none">
+      {/* Left: shuffle - tighter */}
+      <div className="flex items-center gap-2 justify-start">
         <button
           className="control-btn"
           data-active={shuffle}
@@ -49,19 +49,19 @@ export function TransportControls(props: TransportControlsProps) {
           aria-pressed={shuffle}
           title="Shuffle"
         >
-          <Shuffle size={18} />
+          <Shuffle size={20} strokeWidth={2.75} />
         </button>
       </div>
 
       {/* Center: prev / play / next */}
-      <div className="flex items-center justify-center gap-5">
+      <div className="flex items-center justify-center gap-4">
         <button
           className="control-btn"
           onClick={onPrev}
           title="Previous"
           aria-label="Previous"
         >
-          <SkipBack size={18} />
+          <SkipBack size={20} strokeWidth={2.75} />
         </button>
         {isPlaying ? (
           <button
@@ -70,7 +70,7 @@ export function TransportControls(props: TransportControlsProps) {
             title="Pause"
             aria-label="Pause"
           >
-            <Pause size={20} />
+            <Pause size={24} strokeWidth={2.75} />
           </button>
         ) : (
           <button
@@ -79,7 +79,7 @@ export function TransportControls(props: TransportControlsProps) {
             title="Play"
             aria-label="Play"
           >
-            <Play size={20} />
+            <Play size={24} strokeWidth={2.75} />
           </button>
         )}
         <button
@@ -88,12 +88,12 @@ export function TransportControls(props: TransportControlsProps) {
           title="Next"
           aria-label="Next"
         >
-          <SkipForward size={18} />
+          <SkipForward size={20} strokeWidth={2.75} />
         </button>
       </div>
 
       {/* Right: repeat + custom slot (e.g., volume) */}
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex items-center justify-end gap-3">
         <button
           className="control-btn"
           data-active={repeat !== "none"}
@@ -107,7 +107,11 @@ export function TransportControls(props: TransportControlsProps) {
           }
           aria-label="Repeat"
         >
-          {repeat === "one" ? <Repeat1 size={18} /> : <Repeat size={18} />}
+          {repeat === "one" ? (
+            <Repeat1 size={20} strokeWidth={2.75} />
+          ) : (
+            <Repeat size={20} strokeWidth={2.75} />
+          )}
         </button>
         {rightSlot}
       </div>

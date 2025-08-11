@@ -15,7 +15,7 @@ export function NowPlaying({ album, item, coverUrl }: NowPlayingProps) {
   return (
     <div className="mb-5">
       <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wide opacity-70">
-        <Disc3 size={14} /> Now Playing
+        <Disc3 size={16} strokeWidth={2.5} /> Now Playing
       </div>
       <div className="flex items-center gap-4">
         <div className="size-20 border border-white bg-black flex-shrink-0">

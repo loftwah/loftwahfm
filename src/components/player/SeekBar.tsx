@@ -8,7 +8,7 @@ interface SeekBarProps {
 
 export function SeekBar({ currentTime, duration, onSeek }: SeekBarProps) {
   return (
-    <div className="mt-3 flex items-center gap-3">
+    <div className="mt-3 flex items-center gap-3 select-none">
       <span className="text-xs text-white tabular-nums">
         {formatTime(currentTime)}
       </span>
