@@ -8,7 +8,7 @@ import tailwind from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://example.com",
+  site: "https://loftwahfm.pages.dev",
   integrations: [mdx(), sitemap(), react()],
   adapter: cloudflare({
     platformProxy: {

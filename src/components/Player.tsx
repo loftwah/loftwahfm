@@ -88,7 +88,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   const [repeat, setRepeat] = useState<"none" | "one" | "all">("all");
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.8);
+  const [volume, setVolume] = useState(1);
   const mediaRef = useRef<
     HTMLAudioElement &
       HTMLVideoElement & { pause: () => void; play: () => Promise<void> }
