@@ -5,7 +5,7 @@ import '../styles/global.css';
 
 interface Props {
   title: string;
-  description: string;
+  description?: string;
   image?: string; // absolute or root-relative path
   ogType?: string;
   ogAudio?: string;
@@ -18,7 +18,15 @@ const siteOrigin = (Astro?.url?.origin ?? Astro.site) as string;
 const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
 
 // Defaults
-const { title, description, image = '/fm-og.jpg', ogType = 'website', ogAudio, ogVideo, ogAuthor } = Astro.props as Props;
+const {
+  title,
+  description = 'Loftwah FM is my personal SunoAI music player — stream albums and videos at fm.loftwah.com.',
+  image = '/fm-og.jpg',
+  ogType = 'website',
+  ogAudio,
+  ogVideo,
+  ogAuthor,
+} = Astro.props as Props;
 const siteName = 'Loftwah FM';
 const ogLogoPath = '/phantom-love/android-chrome-512x512.png';
 const ogImageURL = new URL(image, siteOrigin);
