@@ -382,8 +382,8 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
       </div>
 
       {/* Bottom transport bar */}
-      <div className="player-bar sticky bottom-0 left-0 right-0 bg-black/90 backdrop-blur supports-[backdrop-filter]:bg-black/70">
-        <div className="panel p-3 mx-auto max-w-4xl mt-6">
+      <div className="player-bar sticky bottom-0 left-0 right-0 bg-black/90 backdrop-blur supports-[backdrop-filter]:bg-black/70 safe-area-bottom">
+        <div className="panel p-4 mx-auto max-w-6xl mt-6">
           <TransportControls
             isPlaying={isPlaying}
             onPlay={doPlay}

@@ -11,7 +11,9 @@ interface NowPlayingProps {
 export function NowPlaying({ album, item, coverUrl }: NowPlayingProps) {
   const [coverFallback, setCoverFallback] = useState<string | null>(null);
   const coverSrc =
-    coverFallback || coverUrl || (album.slug === "all" ? "/all-songs.jpg" : "/fm-og.jpg");
+    coverFallback ||
+    coverUrl ||
+    (album.slug === "all" ? "/all-songs.jpg" : "/fm-og.jpg");
 
   return (
     <div className="mb-5">
@@ -25,7 +27,9 @@ export function NowPlaying({ album, item, coverUrl }: NowPlayingProps) {
             alt={album.title}
             className="h-full w-full object-cover"
             onError={() =>
-              setCoverFallback(album.slug === "all" ? "/all-songs.jpg" : "/fm-og.jpg")
+              setCoverFallback(
+                album.slug === "all" ? "/all-songs.jpg" : "/fm-og.jpg",
+              )
             }
           />
         </div>

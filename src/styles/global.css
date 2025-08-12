@@ -10,6 +10,14 @@ body {
 }
 body {
   @apply bg-black text-white antialiased;
+  font-family:
+    "Atkinson",
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Arial,
+    sans-serif;
 }
 
 /* Safe-area support for iOS */
@@ -32,12 +40,12 @@ body {
 
 /* Utilities */
 .panel {
-  /* Square, solid black with crisp white border */
-  @apply border-2 border-white bg-black;
+  /* Square, solid black with slightly softened border */
+  @apply border-2 border-white/80 bg-black rounded-md;
 }
 .btn {
   /* Square, high-contrast buttons */
-  @apply border-2 border-white px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply border-2 border-white px-3 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed;
   background: black;
   color: white;
 }
@@ -182,6 +190,27 @@ input[type="range"]::-moz-range-track {
 }
 .eq-bar:nth-child(3) {
   height: 10px;
+}
+
+/* Fonts */
+@font-face {
+  font-family: "Atkinson";
+  src: url("/fonts/atkinson-regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson";
+  src: url("/fonts/atkinson-bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Focus ring utility */
+.focus-ring {
+  @apply outline-none ring-2 ring-white ring-offset-2 ring-offset-black;
 }
 
 /* Reduced motion support */
