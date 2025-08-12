@@ -32,9 +32,10 @@ export function AlbumCard({
   album: AlbumData;
   onSelect?: (slug: string) => void;
 }) {
-  const [imgSrc, setImgSrc] = useState(
-    `/media/${album.slug}/${encodeURIComponent(album.cover)}`,
-  );
+  const initialSrc = album.cover?.startsWith("/")
+    ? album.cover
+    : `/media/${album.slug}/${encodeURIComponent(album.cover)}`;
+  const [imgSrc, setImgSrc] = useState(initialSrc);
   return (
     <button
       className="panel w-full text-left overflow-hidden !p-0 hover:bg-white/10"
