@@ -60,7 +60,9 @@ export function AlbumCard({
       <div className="aspect-square w-full bg-black">
         <img
           src={imgSrc}
-          onError={() => setImgSrc("/media/phantom-love/cover.jpg")}
+          onError={() =>
+            setImgSrc(album.slug === "all" ? "/all-songs.jpg" : "/fm-og.jpg")
+          }
           alt={`${album.title} cover`}
           className="h-full w-full object-cover"
           loading="lazy"
