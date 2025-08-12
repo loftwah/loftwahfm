@@ -41,7 +41,7 @@ export function QueueList({
           >
             <div className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white hover:text-black transition-colors">
               <button
-                className="flex items-center gap-3 flex-1 text-left"
+                className="flex items-center gap-3 flex-1 min-w-0 text-left"
                 onClick={() => onSelect(i)}
                 title={q.kind === "video" ? "Video" : "Audio"}
                 aria-label={`${i + 1}. ${q.title} ${q.kind === "video" ? "video" : "audio"}`}
@@ -50,26 +50,42 @@ export function QueueList({
                   {i + 1}
                 </span>
                 {q.kind === "video" ? (
-                  <VideoIcon size={18} strokeWidth={2.5} />
+                  <VideoIcon size={18} strokeWidth={2.5} className="shrink-0" />
                 ) : (
-                  <Music2 size={18} strokeWidth={2.5} />
+                  <Music2 size={18} strokeWidth={2.5} className="shrink-0" />
                 )}
-                <span className="flex-1 truncate text-left">{q.title}</span>
+                <span className="flex-1 min-w-0 truncate text-left">
+                  {q.title}
+                </span>
                 {i === activeIndex ? (
                   isPlaying ? (
                     <span
-                      className="inline-flex items-end gap-0.5"
+                      className="inline-flex items-end gap-0.5 shrink-0"
                       aria-label="Now playing"
                     >
-                      <span className="eq-bar" style={{ animationDelay: "0ms" }} />
-                      <span className="eq-bar" style={{ animationDelay: "150ms" }} />
-                      <span className="eq-bar" style={{ animationDelay: "300ms" }} />
+                      <span
+                        className="eq-bar"
+                        style={{ animationDelay: "0ms" }}
+                      />
+                      <span
+                        className="eq-bar"
+                        style={{ animationDelay: "150ms" }}
+                      />
+                      <span
+                        className="eq-bar"
+                        style={{ animationDelay: "300ms" }}
+                      />
                     </span>
                   ) : (
-                    <Play size={16} strokeWidth={2.5} aria-label="Selected" />
+                    <Play
+                      size={16}
+                      strokeWidth={2.5}
+                      aria-label="Selected"
+                      className="shrink-0"
+                    />
                   )
                 ) : q.durationSec ? (
-                  <span className="text-xs tabular-nums opacity-80">
+                  <span className="hidden sm:inline text-xs tabular-nums opacity-80 shrink-0">
                     {formatTime(q.durationSec)}
                   </span>
                 ) : (
@@ -81,7 +97,7 @@ export function QueueList({
                   href={downloadHref}
                   download={q.file}
                   onClick={(e) => e.stopPropagation()}
-                  className="ml-2 inline-flex items-center text-current/80 hover:text-current"
+                  className="ml-2 inline-flex items-center text-current/80 hover:text-current shrink-0"
                   aria-label={`Download ${q.title}`}
                   title="Download"
                 >

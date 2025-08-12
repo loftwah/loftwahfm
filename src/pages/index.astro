@@ -18,8 +18,8 @@ export const prerender = false;
 <html lang="en">
 	<head>
     <BaseHead
-      title="Loftwah FM — My SunoAI music player"
-      description="My personal SunoAI music player at fm.loftwah.com — stream my generated tracks and videos on phone or desktop."
+      title="Loftwah FM — Loftwah’s personal music player"
+      description="LoftwahFM is my personal music player: a clean, black‑and‑white place where I share what I make and listen to it anywhere. Browse albums, play tracks and videos, and share links that generate proper previews across the web. Built for speed, simplicity, and a distraction‑free experience."
       image="/fm-og.jpg"
       ogType="music.playlist"
       ogAuthor="Loftwah"
@@ -27,14 +27,14 @@ export const prerender = false;
 	</head>
 	<body>
 		<Header />
-        <main class="space-y-6 mx-auto max-w-4xl px-4 mt-6 mb-28">
+        <main class="space-y-6 mx-auto max-w-6xl px-4 mt-6 mb-28">
             <section class="panel p-3">
                 <p class="text-sm">
-                    My personal SunoAI music player. Browse albums, play tracks and videos, and share links that generate rich previews.
+                    LoftwahFM is my own music player — a minimal, fast place to share my work and play it anywhere. Explore albums, listen or watch, and copy links that unfurl with proper previews. No noise, just the music.
                 </p>
             </section>
             {albumEntries.length > 1 ? (
-                <section class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                <section class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                     {([
                       { id: 'all', slug: 'all', title: 'All Songs', artist: 'Loftwah', year: new Date().getFullYear(), cover: '/all-songs.jpg', tracks: [] },
                       ...albumEntries,
