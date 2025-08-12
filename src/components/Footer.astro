@@ -1,15 +1,23 @@
 ---
 const today = new Date();
-import { Album, Github } from '@lucide/astro';
+import { Album, Github, Twitter, Link2 } from '@lucide/astro';
 ---
 
 <footer class="border-t border-white bg-black text-white">
   <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-8 text-sm">
     <span class="inline-flex items-center gap-2">
-      <Album size={14} />
+      <img src="/fm-og.jpg" alt="Loftwah" width="16" height="16" class="size-4 rounded-full border border-white object-cover" loading="lazy" />
       &copy; {today.getFullYear()} Loftwah. All rights reserved.
     </span>
     <div class="flex items-center gap-4">
+      <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://x.com/loftwah" target="_blank" rel="noopener noreferrer">
+        <Twitter size={14} />
+        X
+      </a>
+      <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://linkarooie.com/loftwah" target="_blank" rel="noopener noreferrer">
+        <Link2 size={14} />
+        Links
+      </a>
       <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://github.com/loftwah/loftwahfm" target="_blank" rel="noopener noreferrer">
         <Github size={14} />
         GitHub

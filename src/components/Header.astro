@@ -1,19 +1,27 @@
 ---
 import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
-import { Album, Home, Github } from '@lucide/astro';
+import { Album, Home, Github, Twitter, Link2 } from '@lucide/astro';
 ---
 
 <header class="border-b border-white/60 bg-black/95 backdrop-blur">
   <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 text-white">
     <a href="/" class="flex items-center gap-2 font-semibold tracking-wide">
-      <Album size={18} />
+      <img src="/fm-og.jpg" alt="Loftwah" width="20" height="20" class="size-5 rounded-full border border-white object-cover" loading="eager" decoding="async" />
       Loftwah FM
     </a>
     <div class="flex items-center gap-4 text-sm">
       <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="/">
         <Home size={14} />
         Home
+      </a>
+      <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://x.com/loftwah" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+        <Twitter size={14} />
+        X
+      </a>
+      <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://linkarooie.com/loftwah" target="_blank" rel="noopener noreferrer" aria-label="Link in bio">
+        <Link2 size={14} />
+        Links
       </a>
       <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://github.com/loftwah/loftwahfm" target="_blank" rel="noopener noreferrer">
         <Github size={14} />
