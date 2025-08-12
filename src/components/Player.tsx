@@ -107,12 +107,29 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     mediaRef.current?.pause();
     setIsPlaying(false);
   };
+  const pickRandomIndex = (maxExclusive: number, exclude: number) => {
+    if (maxExclusive <= 1) return 0;
+    let r = exclude;
+    while (r === exclude) {
+      r = Math.floor(Math.random() * maxExclusive);
+    }
+    return r;
+  };
+
   const prev = () => {
     if (mediaRef.current) mediaRef.current.currentTime = 0;
+    if (shuffle) {
+      setIndex(pickRandomIndex(queue.length, index));
+      return;
+    }
     if (index > 0) setIndex(index - 1);
     else if (repeat === "all") setIndex(queue.length - 1);
   };
   const next = () => {
+    if (shuffle) {
+      setIndex(pickRandomIndex(queue.length, index));
+      return;
+    }
     if (index < queue.length - 1) setIndex(index + 1);
     else if (repeat === "all") setIndex(0);
   };
@@ -137,10 +154,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     coverUrl,
   );
 
-  useEffect(() => {
-    if (!current) return;
-    if (shuffle) setIndex(Math.floor(Math.random() * queue.length));
-  }, [shuffle]);
+  // When toggling shuffle, do not jump tracks immediately; apply on next/prev instead
 
   useEffect(() => {
     if (isPlaying) doPlay();

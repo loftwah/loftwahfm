@@ -33,17 +33,17 @@ export function AlbumCard({
   onSelect?: (slug: string) => void;
 }) {
   const [imgSrc, setImgSrc] = useState(
-    `/${album.slug}/${encodeURIComponent(album.cover)}`,
+    `/media/${album.slug}/${encodeURIComponent(album.cover)}`,
   );
   return (
     <button
-      className="panel w-full text-left overflow-hidden btn !p-0 hover:bg-white/5"
+      className="panel w-full text-left overflow-hidden !p-0 hover:bg-white/10"
       onClick={() => onSelect?.(album.slug)}
     >
       <div className="aspect-square w-full bg-black">
         <img
           src={imgSrc}
-          onError={() => setImgSrc("/blog-placeholder-1.jpg")}
+          onError={() => setImgSrc("/media/phantom-love/cover.jpg")}
           alt={`${album.title} cover`}
           className="h-full w-full object-cover"
           loading="lazy"

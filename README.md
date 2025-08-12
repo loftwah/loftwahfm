@@ -1,64 +1,123 @@
-# Astro Starter Kit: Blog
+## LoftwahFM
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/astro-blog-starter-template)
+Minimal, black & white, web‑first music player built with Astro + React, served on Cloudflare Workers, and streaming media from Cloudflare R2.
 
-![Astro Template Preview](https://github.com/withastro/astro/assets/2244813/ff10799f-a816-4703-b967-c78997e8323d)
+### Overview
 
-<!-- dash-content-start -->
+- **Albums** are defined in `src/content/albums/*.yaml` and rendered on the homepage.
+- **Media files** (audio/video/cover images) live in root‑level folders named after each album’s `slug`. They are uploaded to R2 and streamed through `src/pages/media/[...key].ts`.
+- **Dev bucket**: `loftwahfm-dev` (used by preview). **Prod bucket**: `loftwahfm`.
+- **Node version**: `22` (see `.nvmrc`).
 
-Create a blog with Astro and deploy it on Cloudflare Workers as a [static website](https://developers.cloudflare.com/workers/static-assets/).
+## Prerequisites
 
-Features:
+- Node 22: `nvm use 22`
+- Install dependencies: `npm ci`
+- Cloudflare account and Wrangler logged in: `npx wrangler login`
 
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and OpenGraph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-- ✅ Built-in Observability logging
+## Commands
 
-<!-- dash-content-end -->
+- **Preview (dev bucket, auto‑sync albums, remote dev):**
+  - `npm run preview`
+- **Deploy to production (auto‑sync albums, then deploy):**
+  - `npm run deploy`
+- **Manual R2 sync only:**
+  - `npm run sync:dev` or `npm run sync:prod`
 
-## Getting Started
+The preview uses `wrangler dev --remote` with `MEDIA` bound to `loftwahfm-dev`. Production uses `MEDIA` bound to `loftwahfm` (see `wrangler.json`).
 
-Outside of this repo, you can start a new project with this template using [C3](https://developers.cloudflare.com/pages/get-started/c3/) (the `create-cloudflare` CLI):
+## Add a new album
 
-```bash
-npm create cloudflare@latest -- --template=cloudflare/templates/astro-blog-starter-template
+1) Create a folder at the repository root with the album slug. Example: `future-classics/`.
+
+Put files directly in this folder (no subdirectories):
+- `cover.jpg` (or `.png`, used for the album card and metadata)
+- `.mp3` audio files
+- Optional video files: `.mp4` or `.webm`
+
+2) Add a YAML file at `src/content/albums/<slug>.yaml`:
+
+```yaml
+slug: future-classics
+title: Future Classics
+artist: Loftwah
+year: 2025
+cover: cover.jpg
+tracks:
+  - title: Track One
+    file: Track One.mp3
+  - title: Track Two
+    file: Track Two.mp3
+# Optional videos
+# videos:
+#   - title: Video One
+#     file: Video One.mp4
+#     poster: cover.jpg
 ```
 
-A live public deployment of this template is available at [https://astro-blog-starter-template.templates.workers.dev](https://astro-blog-starter-template.templates.workers.dev)
+3) Preview:
+- `npm run preview`
 
-## 🚀 Project Structure
+The sync step uploads every file in each root‑level album folder to `loftwahfm-dev` under keys `<slug>/<filename>`. The UI will list the new album and stream media via `/media/<slug>/<file>`.
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+4) Deploy when ready:
+- `npm run deploy`
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## How it works
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+- `src/content.config.ts` defines the `albums` collection and schema. `src/pages/index.astro` loads all albums with `getCollection('albums')` and renders cards and the player.
+- `src/components/AlbumCard.tsx` and `src/components/Player.tsx` both fetch media via the `/media/` route so that R2 headers/range requests are handled properly.
+- `src/pages/media/[...key].ts` is an edge route that proxies R2, supports range requests, sets content type, and respects ETag/Last‑Modified.
+- `scripts/sync-r2.mjs` uploads the contents of each root‑level album folder to the appropriate R2 bucket. `npm run preview` calls `sync:dev` automatically; `npm run deploy` calls `sync:prod` first.
 
-Any static assets, like images, can be placed in the `public/` directory.
+### R2 keys
 
-## 🧞 Commands
+R2 object keys follow this pattern:
 
-All commands are run from the root of the project, from a terminal:
+```
+<bucket>/<slug>/<filename>
+```
 
-| Command                           | Action                                           |
-| :-------------------------------- | :----------------------------------------------- |
-| `npm install`                     | Installs dependencies                            |
-| `npm run dev`                     | Starts local dev server at `localhost:4321`      |
-| `npm run build`                   | Build your production site to `./dist/`          |
-| `npm run preview`                 | Preview your build locally, before deploying     |
-| `npm run astro ...`               | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help`         | Get help using the Astro CLI                     |
-| `npm run build && npm run deploy` | Deploy your production site to Cloudflare        |
-| `npm wrangler tail`               | View real-time logs for all Workers              |
+Examples:
 
-## 👀 Want to learn more?
+- `loftwahfm-dev/phantom-love/cover.jpg`
+- `loftwahfm-dev/phantom-love/Phantom Love.mp3`
+- `loftwahfm-dev/shadow-moves/Shadow Moves (Pop Remix).mp3`
 
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Conventions and tips
 
-## Credit
+- Filenames in YAML must match files exactly (case and spaces). The app URL‑encodes filenames when requesting via `/media/...`.
+- Keep album folders flat. Avoid nested folders.
+- Covers are read from `/media/<slug>/<cover>`; use a square or near‑square image to best fill the card.
+- Videos are supported. Add a `videos:` array in YAML; the player will show a video element for those queue items.
+- Shuffle picks a random next/prev item each time. Repeat modes: off, one, all.
 
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+## Troubleshooting
+
+- Missing cover or 404 from `/media/...`:
+  - Confirm the file exists in R2 under `<slug>/<filename>`.
+  - Check the filename and YAML entry match exactly.
+  - In preview, confirm you are using the dev bucket (`loftwahfm-dev`).
+- Audio won’t play or can’t seek:
+  - Ensure requests are going through `/media/...` so range requests are supported.
+- Album not listed:
+  - Verify the YAML is in `src/content/albums/` and validates against the schema (see `src/content.config.ts`).
+  - Restart preview if you added files while it was running.
+- Wrong bucket in preview:
+  - Check `wrangler.json` → `preview_bucket_name: "loftwahfm-dev"`.
+
+## Project layout
+
+- `src/pages/index.astro`: homepage and wiring for album list/player.
+- `src/pages/media/[...key].ts`: R2 proxy route.
+- `src/components/AlbumCard.tsx`, `src/components/Player.tsx`: UI components.
+- `src/components/player/*`: player UI pieces.
+- `src/content/albums/*.yaml`: album definitions.
+- `scripts/sync-r2.mjs`: album file uploader (dev/prod).
+- `wrangler.json`: bucket bindings; dev uses `loftwahfm-dev`, prod uses `loftwahfm`.
+- `.nvmrc`: Node 22.
+
+## Roadmap
+
+- Optional album scaffolding command to generate YAML from a folder.
+- Album‑agnostic site icons and OG defaults.
