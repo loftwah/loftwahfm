@@ -10,7 +10,7 @@ interface NowPlayingProps {
 
 export function NowPlaying({ album, item, coverUrl }: NowPlayingProps) {
   const [coverFallback, setCoverFallback] = useState<string | null>(null);
-  const coverSrc = coverFallback || coverUrl || "";
+  const coverSrc = coverFallback || coverUrl || "/media/phantom-love/cover.jpg";
 
   return (
     <div className="mb-5">
@@ -23,7 +23,7 @@ export function NowPlaying({ album, item, coverUrl }: NowPlayingProps) {
             src={coverSrc}
             alt={album.title}
             className="h-full w-full object-cover"
-            onError={() => setCoverFallback("/blog-placeholder-1.jpg")}
+            onError={() => setCoverFallback("/media/phantom-love/cover.jpg")}
           />
         </div>
         <div className="min-w-0">

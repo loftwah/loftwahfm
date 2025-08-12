@@ -7,17 +7,19 @@ import { QueueList } from "./player/QueueList";
 import { NowPlaying } from "./player/NowPlaying";
 
 type QueueItem =
-  | (TrackItem & { kind: "audio" })
-  | (VideoItem & { kind: "video" });
+  | (TrackItem & { kind: "audio"; albumSlug: string })
+  | (VideoItem & { kind: "video"; albumSlug: string });
 
 function buildQueue(album: AlbumData): QueueItem[] {
   const tracks: QueueItem[] = (album.tracks || []).map((t) => ({
     ...t,
     kind: "audio",
+    albumSlug: album.slug,
   }));
   const videos: QueueItem[] = (album.videos || []).map((v) => ({
     ...v,
     kind: "video",
+    albumSlug: album.slug,
   }));
   return [...tracks, ...videos];
 }
@@ -59,10 +61,28 @@ function useMediaSession(
 }
 
 export default function Player({ albums }: { albums: AlbumData[] }) {
-  const [selectedSlug, setSelectedSlug] = useState<string>(
-    albums[0]?.slug ?? "",
-  );
+  // Initialize from query param if present
+  const initialSlug = (() => {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      return p.get("album") || albums[0]?.slug || "";
+    } catch {
+      return albums[0]?.slug || "";
+    }
+  })();
+  const [selectedSlug, setSelectedSlug] = useState<string>(initialSlug);
   const album = useMemo(() => {
+    if (selectedSlug === "all") {
+      return {
+        slug: "all",
+        title: "All Songs",
+        artist: "Loftwah",
+        year: new Date().getFullYear(),
+        cover: "",
+        tracks: [],
+        videos: [],
+      } as AlbumData;
+    }
     const found =
       albums.find((a) => a.slug === selectedSlug) ?? albums[0] ?? null;
     if (!found) return null;
@@ -71,10 +91,21 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   }, [albums, selectedSlug]);
   // Always fetch media via the Worker route that proxies R2
   const base = album ? `/media/${album.slug}` : "";
-  const coverUrl = album
-    ? `/media/${album.slug}/${encodeURIComponent(album.cover)}`
-    : null;
-  const queue = useMemo(() => (album ? buildQueue(album) : []), [album]);
+  // Lookup for per-album cover by slug
+  const slugToAlbum = useMemo(() => {
+    const map: Record<string, AlbumData> = {};
+    for (const a of albums) map[a.slug] = a;
+    return map;
+  }, [albums]);
+  const queue = useMemo(() => {
+    if (!album) return [] as QueueItem[];
+    if (album.slug === "all") {
+      const q: QueueItem[] = [];
+      for (const a of albums) q.push(...buildQueue(a));
+      return q;
+    }
+    return buildQueue(album);
+  }, [album, albums]);
   const [index, setIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [shuffle, setShuffle] = useState(false);
@@ -95,6 +126,32 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     setDuration(0);
   }, [album?.slug]);
 
+  // Reflect selected album in the URL for shareability
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (selectedSlug) url.searchParams.set("album", selectedSlug);
+      else url.searchParams.delete("album");
+      window.history.replaceState({}, "", url.toString());
+    } catch {}
+  }, [selectedSlug]);
+
+  // Listen for album selection events dispatched by album cards
+  useEffect(() => {
+    const onAlbumSelect = (e: Event) => {
+      const custom = e as CustomEvent<string>;
+      if (custom.detail && custom.detail !== selectedSlug) {
+        setSelectedSlug(custom.detail);
+      }
+    };
+    window.addEventListener("album-select", onAlbumSelect as EventListener);
+    return () =>
+      window.removeEventListener(
+        "album-select",
+        onAlbumSelect as EventListener,
+      );
+  }, [selectedSlug]);
+
   const current = queue[index] ?? null;
 
   const doPlay = async () => {
@@ -107,12 +164,29 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     mediaRef.current?.pause();
     setIsPlaying(false);
   };
+  const pickRandomIndex = (maxExclusive: number, exclude: number) => {
+    if (maxExclusive <= 1) return 0;
+    let r = exclude;
+    while (r === exclude) {
+      r = Math.floor(Math.random() * maxExclusive);
+    }
+    return r;
+  };
+
   const prev = () => {
     if (mediaRef.current) mediaRef.current.currentTime = 0;
+    if (shuffle) {
+      setIndex(pickRandomIndex(queue.length, index));
+      return;
+    }
     if (index > 0) setIndex(index - 1);
     else if (repeat === "all") setIndex(queue.length - 1);
   };
   const next = () => {
+    if (shuffle) {
+      setIndex(pickRandomIndex(queue.length, index));
+      return;
+    }
     if (index < queue.length - 1) setIndex(index + 1);
     else if (repeat === "all") setIndex(0);
   };
@@ -126,6 +200,18 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     mediaRef.current.volume = volume;
   }, [volume, current?.file]);
 
+  // Prefer the specific item's album cover when available (e.g., in All Songs)
+  const resolvedCoverUrl = (() => {
+    if (current?.albumSlug && slugToAlbum[current.albumSlug]?.cover) {
+      const a = slugToAlbum[current.albumSlug];
+      return `/media/${a.slug}/${encodeURIComponent(a.cover)}`;
+    }
+    if (album && album.cover) {
+      return `/media/${album.slug}/${encodeURIComponent(album.cover)}`;
+    }
+    return null;
+  })();
+
   useMediaSession(
     album,
     current,
@@ -134,13 +220,10 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     doPlay,
     doPause,
     seekTo,
-    coverUrl,
+    resolvedCoverUrl,
   );
 
-  useEffect(() => {
-    if (!current) return;
-    if (shuffle) setIndex(Math.floor(Math.random() * queue.length));
-  }, [shuffle]);
+  // When toggling shuffle, do not jump tracks immediately; apply on next/prev instead
 
   useEffect(() => {
     if (isPlaying) doPlay();
@@ -155,7 +238,9 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     next();
   };
 
-  const src = current ? mediaUrl(base, current.file) : undefined;
+  const src = current
+    ? mediaUrl(`/media/${current.albumSlug || album?.slug || ""}`, current.file)
+    : undefined;
   const [coverFallback, setCoverFallback] = useState<string | null>(null);
 
   // Keyboard shortcuts: Space=play/pause, arrows seek, P/N previous/next, up/down volume
@@ -241,7 +326,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
           <NowPlaying
             album={album}
             item={{ kind: current.kind, title: current.title }}
-            coverUrl={coverFallback || coverUrl || null}
+            coverUrl={coverFallback || resolvedCoverUrl || null}
           />
         )}
 
@@ -282,20 +367,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
           />
         )}
 
-        {/* Album selector (compact pills) */}
-        <div className="flex flex-wrap gap-2 pb-4">
-          {/* reuse Pill styles but via component for clarity */}
-          {/* Avoid importing the entire AlbumCard; keep this lightweight */}
-          {albums.map((a) => (
-            <button
-              key={a.slug}
-              className={`pill ${a.slug === album?.slug ? "pill-active" : ""}`}
-              onClick={() => setSelectedSlug(a.slug)}
-            >
-              {a.title}
-            </button>
-          ))}
-        </div>
+        {/* Removed pill album selector; album selection happens via clickable covers */}
 
         {/* Queue list (one column) */}
         <QueueList

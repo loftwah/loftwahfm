@@ -32,18 +32,35 @@ export function AlbumCard({
   album: AlbumData;
   onSelect?: (slug: string) => void;
 }) {
-  const [imgSrc, setImgSrc] = useState(
-    `/${album.slug}/${encodeURIComponent(album.cover)}`,
-  );
+  const initialSrc = album.cover?.startsWith("/")
+    ? album.cover
+    : `/media/${album.slug}/${encodeURIComponent(album.cover)}`;
+  const [imgSrc, setImgSrc] = useState(initialSrc);
   return (
     <button
-      className="panel w-full text-left overflow-hidden btn !p-0 hover:bg-white/5"
-      onClick={() => onSelect?.(album.slug)}
+      className="panel w-full text-left overflow-hidden !p-0 hover:bg-white/10"
+      onClick={() => {
+        // Allow parent islands to hook directly
+        onSelect?.(album.slug);
+        try {
+          // Notify the Player island to switch albums
+          window.dispatchEvent(
+            new CustomEvent<string>("album-select", { detail: album.slug }),
+          );
+          // Keep URL shareable and jump to the player
+          const url = new URL(window.location.href);
+          url.searchParams.set("album", album.slug);
+          window.history.pushState({}, "", url.toString());
+          const playerEl = document.getElementById("player");
+          if (playerEl)
+            playerEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        } catch {}
+      }}
     >
       <div className="aspect-square w-full bg-black">
         <img
           src={imgSrc}
-          onError={() => setImgSrc("/blog-placeholder-1.jpg")}
+          onError={() => setImgSrc("/media/phantom-love/cover.jpg")}
           alt={`${album.title} cover`}
           className="h-full w-full object-cover"
           loading="lazy"
