@@ -1,11 +1,12 @@
 import React from "react";
-import { Music2, Play, Video as VideoIcon } from "lucide-react";
+import { Music2, Play, Video as VideoIcon, Download } from "lucide-react";
 
 export type QueueListItem = {
   kind: "audio" | "video";
   file: string;
   title: string;
   durationSec?: number;
+  albumSlug?: string;
 };
 
 interface QueueListProps {
@@ -27,57 +28,70 @@ export function QueueList({
       role="listbox"
       aria-label="Track queue"
     >
-      {items.map((q, i) => (
-        <li
-          key={`${q.kind}:${q.file}`}
-          className={`${i === activeIndex ? "bg-white text-black" : ""}`}
-          role="option"
-          aria-selected={i === activeIndex}
-        >
-          <button
-            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white hover:text-black transition-colors"
-            onClick={() => onSelect(i)}
-            title={q.kind === "video" ? "Video" : "Audio"}
-            aria-label={`${i + 1}. ${q.title} ${q.kind === "video" ? "video" : "audio"}`}
+      {items.map((q, i) => {
+        const downloadHref = q.albumSlug
+          ? `/media/${q.albumSlug}/${encodeURIComponent(q.file)}`
+          : undefined;
+        return (
+          <li
+            key={`${q.kind}:${q.file}`}
+            className={`${i === activeIndex ? "bg-white text-black" : ""}`}
+            role="option"
+            aria-selected={i === activeIndex}
           >
-            <span className="w-6 text-right tabular-nums text-xs opacity-70">
-              {i + 1}
-            </span>
-            {q.kind === "video" ? (
-              <VideoIcon size={18} strokeWidth={2.5} />
-            ) : (
-              <Music2 size={18} strokeWidth={2.5} />
-            )}
-            <span className="flex-1 truncate text-left">{q.title}</span>
-            {i === activeIndex ? (
-              isPlaying ? (
-                <span
-                  className="inline-flex items-end gap-0.5"
-                  aria-label="Now playing"
-                >
-                  <span className="eq-bar" style={{ animationDelay: "0ms" }} />
-                  <span
-                    className="eq-bar"
-                    style={{ animationDelay: "150ms" }}
-                  />
-                  <span
-                    className="eq-bar"
-                    style={{ animationDelay: "300ms" }}
-                  />
+            <div className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white hover:text-black transition-colors">
+              <button
+                className="flex items-center gap-3 flex-1 text-left"
+                onClick={() => onSelect(i)}
+                title={q.kind === "video" ? "Video" : "Audio"}
+                aria-label={`${i + 1}. ${q.title} ${q.kind === "video" ? "video" : "audio"}`}
+              >
+                <span className="w-6 text-right tabular-nums text-xs opacity-70">
+                  {i + 1}
                 </span>
-              ) : (
-                <Play size={16} strokeWidth={2.5} aria-label="Selected" />
-              )
-            ) : q.durationSec ? (
-              <span className="text-xs tabular-nums opacity-80">
-                {formatTime(q.durationSec)}
-              </span>
-            ) : (
-              <span className="text-xs opacity-50"> </span>
-            )}
-          </button>
-        </li>
-      ))}
+                {q.kind === "video" ? (
+                  <VideoIcon size={18} strokeWidth={2.5} />
+                ) : (
+                  <Music2 size={18} strokeWidth={2.5} />
+                )}
+                <span className="flex-1 truncate text-left">{q.title}</span>
+                {i === activeIndex ? (
+                  isPlaying ? (
+                    <span
+                      className="inline-flex items-end gap-0.5"
+                      aria-label="Now playing"
+                    >
+                      <span className="eq-bar" style={{ animationDelay: "0ms" }} />
+                      <span className="eq-bar" style={{ animationDelay: "150ms" }} />
+                      <span className="eq-bar" style={{ animationDelay: "300ms" }} />
+                    </span>
+                  ) : (
+                    <Play size={16} strokeWidth={2.5} aria-label="Selected" />
+                  )
+                ) : q.durationSec ? (
+                  <span className="text-xs tabular-nums opacity-80">
+                    {formatTime(q.durationSec)}
+                  </span>
+                ) : (
+                  <span className="text-xs opacity-50"> </span>
+                )}
+              </button>
+              {q.kind === "audio" && downloadHref ? (
+                <a
+                  href={downloadHref}
+                  download={q.file}
+                  onClick={(e) => e.stopPropagation()}
+                  className="ml-2 inline-flex items-center text-current/80 hover:text-current"
+                  aria-label={`Download ${q.title}`}
+                  title="Download"
+                >
+                  <Download size={16} />
+                </a>
+              ) : null}
+            </div>
+          </li>
+        );
+      })}
     </ol>
   );
 }
