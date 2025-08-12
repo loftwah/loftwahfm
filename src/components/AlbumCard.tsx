@@ -38,7 +38,23 @@ export function AlbumCard({
   return (
     <button
       className="panel w-full text-left overflow-hidden !p-0 hover:bg-white/10"
-      onClick={() => onSelect?.(album.slug)}
+      onClick={() => {
+        // Allow parent islands to hook directly
+        onSelect?.(album.slug);
+        try {
+          // Notify the Player island to switch albums
+          window.dispatchEvent(
+            new CustomEvent<string>("album-select", { detail: album.slug }),
+          );
+          // Keep URL shareable and jump to the player
+          const url = new URL(window.location.href);
+          url.searchParams.set("album", album.slug);
+          window.history.pushState({}, "", url.toString());
+          const playerEl = document.getElementById("player");
+          if (playerEl)
+            playerEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        } catch {}
+      }}
     >
       <div className="aspect-square w-full bg-black">
         <img

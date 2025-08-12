@@ -28,14 +28,15 @@ The preview uses `wrangler dev --remote` with `MEDIA` bound to `loftwahfm-dev`. 
 
 ## Add a new album
 
-1) Create a folder at the repository root with the album slug. Example: `future-classics/`.
+1. Create a folder at the repository root with the album slug. Example: `future-classics/`.
 
 Put files directly in this folder (no subdirectories):
+
 - `cover.jpg` (or `.png`, used for the album card and metadata)
 - `.mp3` audio files
 - Optional video files: `.mp4` or `.webm`
 
-2) Add a YAML file at `src/content/albums/<slug>.yaml`:
+2. Add a YAML file at `src/content/albums/<slug>.yaml`:
 
 ```yaml
 slug: future-classics
@@ -55,12 +56,14 @@ tracks:
 #     poster: cover.jpg
 ```
 
-3) Preview:
+3. Preview:
+
 - `npm run preview`
 
 The sync step uploads every file in each root‑level album folder to `loftwahfm-dev` under keys `<slug>/<filename>`. The UI will list the new album and stream media via `/media/<slug>/<file>`.
 
-4) Deploy when ready:
+4. Deploy when ready:
+
 - `npm run deploy`
 
 ## How it works
@@ -69,6 +72,13 @@ The sync step uploads every file in each root‑level album folder to `loftwahfm
 - `src/components/AlbumCard.tsx` and `src/components/Player.tsx` both fetch media via the `/media/` route so that R2 headers/range requests are handled properly.
 - `src/pages/media/[...key].ts` is an edge route that proxies R2, supports range requests, sets content type, and respects ETag/Last‑Modified.
 - `scripts/sync-r2.mjs` uploads the contents of each root‑level album folder to the appropriate R2 bucket. `npm run preview` calls `sync:dev` automatically; `npm run deploy` calls `sync:prod` first.
+
+## All Songs mode
+
+- The homepage shows a virtual card titled "All Songs". Clicking it plays a single queue that includes every track and video from all albums.
+- The selection is reflected in the URL as the query param `?album=all` so it can be linked directly.
+- Provide an image at `public/all-songs.jpg` to use as the card artwork (recommended square). If the file is missing, the card will render without a cover until you add it.
+- While in All Songs, the Now Playing section and media session artwork display the current track's actual album cover.
 
 ### R2 keys
 

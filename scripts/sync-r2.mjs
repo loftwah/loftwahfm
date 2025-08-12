@@ -70,7 +70,9 @@ for (const slug of albumsOnDisk) {
         console.log(`Skip unchanged: ${key}`);
       } else {
         // Use --remote so preview (which runs remotely) sees the same objects
-        sh(`npx --yes wrangler r2 object put "${key}" --file "${file}" --remote`);
+        sh(
+          `npx --yes wrangler r2 object put "${key}" --file "${file}" --remote`,
+        );
         cache[env][key] = { size: st.size, mtimeMs: st.mtimeMs };
       }
     }

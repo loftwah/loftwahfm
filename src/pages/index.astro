@@ -34,7 +34,10 @@ export const prerender = false;
             </section>
             {albumEntries.length > 1 ? (
                 <section class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                    {albumEntries.map((a) => (
+                    {([
+                      { id: 'all', slug: 'all', title: 'All Songs', artist: 'Loftwah', year: new Date().getFullYear(), cover: '/all-songs.jpg', tracks: [] },
+                      ...albumEntries,
+                    ]).map((a) => (
                         // @ts-ignore Astro client directive
                         <AlbumCard album={a as any} client:idle />
                     ))}
@@ -43,7 +46,9 @@ export const prerender = false;
                 <p>No albums found.</p>
             ) : null}
             <!-- @ts-ignore Astro client directive -->
-            <Player albums={albumEntries as any} client:load />
+            <div id="player">
+              <Player albums={albumEntries as any} client:load />
+            </div>
         </main>
 		<Footer />
 	</body>
