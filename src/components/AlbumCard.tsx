@@ -152,24 +152,26 @@ export function AlbumCard({
             </span>
           ) : null}
         </p>
-        <div className="mt-2 flex items-center gap-2">
-          <a
-            href={albumHref}
-            onClick={(e) => e.stopPropagation()}
-            className="btn text-xs inline-flex items-center gap-1"
-            title="Open shareable link"
-          >
-            <LinkIcon size={14} /> Link
-          </a>
-          <button
-            className="btn text-xs inline-flex items-center gap-1"
-            onClick={copyLink}
-            title="Copy album link"
-          >
-            {copied ? <CheckIcon size={14} /> : <CopyIcon size={14} />}{" "}
-            {copied ? "Copied" : "Copy"}
-          </button>
-        </div>
+        {album.slug !== "playlist" ? (
+          <div className="mt-2 flex items-center gap-2">
+            <a
+              href={albumHref}
+              onClick={(e) => e.stopPropagation()}
+              className="btn text-xs inline-flex items-center gap-1"
+              title="Open shareable link"
+            >
+              <LinkIcon size={14} /> Link
+            </a>
+            <button
+              className="btn text-xs inline-flex items-center gap-1"
+              onClick={copyLink}
+              title="Copy album link"
+            >
+              {copied ? <CheckIcon size={14} /> : <CopyIcon size={14} />}{" "}
+              {copied ? "Copied" : "Copy"}
+            </button>
+          </div>
+        ) : null}
       </div>
     </button>
   );
