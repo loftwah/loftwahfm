@@ -392,17 +392,18 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     ? mediaUrl(`/media/${current.albumSlug || album?.slug || ""}`, current.file)
     : undefined;
   const [coverFallback, setCoverFallback] = useState<string | null>(null);
-  // Lyrics support: try fetching lyrics.txt from the current item's album directory
+  // Lyrics support: only attempt when playing an audio item from a real album (exclude virtual views like "all" and "playlist")
   const [lyrics, setLyrics] = useState<string | null>(null);
   useEffect(() => {
     setLyrics(null);
     const slug = current?.albumSlug || album?.slug;
-    if (!slug) return;
+    const isAudio = current?.kind === "audio";
+    if (!slug || slug === "all" || slug === "playlist" || !isAudio) return;
     fetch(`/media/${slug}/${encodeURIComponent("lyrics.txt")}`)
       .then((r) => (r.ok ? r.text() : Promise.reject()))
       .then((text) => setLyrics(text))
       .catch(() => setLyrics(null));
-  }, [current?.albumSlug, album?.slug]);
+  }, [current?.albumSlug, album?.slug, current?.kind]);
   // Refresh playlist-based views when the playlist changes elsewhere
   useEffect(() => {
     const read = () => {
