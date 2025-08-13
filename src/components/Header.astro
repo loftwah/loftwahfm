@@ -1,65 +1,150 @@
 ---
-import { Github, Twitter, Link2, Menu, BookOpen } from '@lucide/astro';
+import { Github, Twitter, Link2, Menu, BookOpen } from "@lucide/astro";
 ---
 
 <header class="border-b border-white/60 bg-black/95 backdrop-blur">
-  <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 text-white">
-    <a href="/" class="flex items-center gap-2 font-semibold tracking-wide text-base sm:text-lg">
-      <img src="/fm-og.jpg" alt="Loftwah" width="20" height="20" class="size-5 rounded-full border border-white object-cover" loading="eager" decoding="async" />
+  <nav
+    class="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 text-white"
+  >
+    <a
+      href="/"
+      class="flex items-center gap-2 font-semibold tracking-wide text-base sm:text-lg"
+    >
+      <img
+        src="/fm-og.jpg"
+        alt="Loftwah"
+        width="20"
+        height="20"
+        class="size-5 rounded-full border border-white object-cover"
+        loading="eager"
+        decoding="async"
+      />
       Loftwah FM
     </a>
     <!-- Desktop nav -->
     <div class="hidden sm:flex items-center gap-4 text-sm">
-      <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="/guide/sunoai">
+      <a
+        class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        href="/guide/sunoai"
+      >
         <BookOpen size={14} />
         <span>Guide</span>
       </a>
-      <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://x.com/loftwah" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+      <a
+        class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        href="/guide/styles"
+      >
+        <BookOpen size={14} />
+        <span>Styles</span>
+      </a>
+      <a
+        class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        href="https://x.com/loftwah"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="X (Twitter)"
+      >
         <Twitter size={14} />
         <span class="hidden sm:inline">X</span>
       </a>
-      <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://linkarooie.com/loftwah" target="_blank" rel="noopener noreferrer" aria-label="Link in bio">
+      <a
+        class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        href="https://linkarooie.com/loftwah"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Link in bio"
+      >
         <Link2 size={14} />
         <span class="hidden sm:inline">Links</span>
       </a>
-      <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://github.com/loftwah/loftwahfm" target="_blank" rel="noopener noreferrer">
+      <a
+        class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        href="https://github.com/loftwah/loftwahfm"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <Github size={14} />
         <span class="hidden sm:inline">GitHub</span>
       </a>
     </div>
     <!-- Mobile menu button -->
-    <button id="menu-button" type="button" class="sm:hidden inline-flex items-center gap-2 rounded-md border border-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" aria-haspopup="true" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+    <button
+      id="menu-button"
+      type="button"
+      class="sm:hidden inline-flex items-center gap-2 rounded-md border border-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      aria-label="Open menu"
+    >
       <Menu size={16} aria-hidden="true" />
       Menu
     </button>
   </nav>
   <!-- Mobile menu -->
-  <div id="mobile-menu" class="sm:hidden border-t border-white bg-black text-white" hidden>
+  <div
+    id="mobile-menu"
+    class="sm:hidden border-t border-white bg-black text-white"
+    hidden
+  >
     <div class="mx-auto max-w-6xl px-4 py-3">
       <ul class="flex flex-col gap-2 text-sm">
-        <li><a class="block w-full rounded-md border border-white px-3 py-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="/">Home</a></li>
-        <li><a class="w-full rounded-md border border-white px-3 py-2 inline-flex items-center gap-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="/guide/sunoai"><BookOpen size={14} /> Guide: SunoAI</a></li>
-        <li><a class="w-full rounded-md border border-white px-3 py-2 inline-flex items-center gap-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://x.com/loftwah" target="_blank" rel="noopener noreferrer"><Twitter size={14} /> X</a></li>
-        <li><a class="w-full rounded-md border border-white px-3 py-2 inline-flex items-center gap-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://linkarooie.com/loftwah" target="_blank" rel="noopener noreferrer"><Link2 size={14} /> Links</a></li>
-        <li><a class="w-full rounded-md border border-white px-3 py-2 inline-flex items-center gap-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://github.com/loftwah/loftwahfm" target="_blank" rel="noopener noreferrer"><Github size={14} /> GitHub</a></li>
+        <li>
+          <a
+            class="block w-full rounded-md border border-white px-3 py-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            href="/">Home</a>
+        </li>
+        <li>
+          <a
+            class="w-full rounded-md border border-white px-3 py-2 inline-flex items-center gap-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            href="/guide/sunoai"><BookOpen size={14} /> Guide: SunoAI</a>
+        </li>
+        <li>
+          <a
+            class="w-full rounded-md border border-white px-3 py-2 inline-flex items-center gap-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            href="/guide/styles"><BookOpen size={14} /> Styles</a>
+        </li>
+        <li>
+          <a
+            class="w-full rounded-md border border-white px-3 py-2 inline-flex items-center gap-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            href="https://x.com/loftwah"
+            target="_blank"
+            rel="noopener noreferrer"><Twitter size={14} /> X</a>
+        </li>
+        <li>
+          <a
+            class="w-full rounded-md border border-white px-3 py-2 inline-flex items-center gap-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            href="https://linkarooie.com/loftwah"
+            target="_blank"
+            rel="noopener noreferrer"><Link2 size={14} /> Links</a>
+        </li>
+        <li>
+          <a
+            class="w-full rounded-md border border-white px-3 py-2 inline-flex items-center gap-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            href="https://github.com/loftwah/loftwahfm"
+            target="_blank"
+            rel="noopener noreferrer"><Github size={14} /> GitHub</a>
+        </li>
       </ul>
     </div>
   </div>
 </header>
 
 <script is:inline>
-  const menuButton = document.getElementById('menu-button');
-  const menu = document.getElementById('mobile-menu');
+  const menuButton = document.getElementById("menu-button");
+  const menu = document.getElementById("mobile-menu");
   if (menuButton && menu) {
     const setExpanded = (expanded) => {
-      menuButton.setAttribute('aria-expanded', String(expanded));
+      menuButton.setAttribute("aria-expanded", String(expanded));
       menu.hidden = !expanded;
     };
     const toggle = () => setExpanded(menu.hidden);
-    const onKeyDown = (e) => { if (e.key === 'Escape') setExpanded(false); };
-    menuButton.addEventListener('click', toggle);
-    document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('click', (e) => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setExpanded(false);
+    };
+    menuButton.addEventListener("click", toggle);
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("click", (e) => {
       if (!menu.hidden && !menu.contains(e.target) && e.target !== menuButton) {
         setExpanded(false);
       }
