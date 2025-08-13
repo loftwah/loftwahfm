@@ -1,5 +1,5 @@
 ---
-import { Github, Twitter, Link2 } from '@lucide/astro';
+import { Github, Twitter, Link2, Menu } from '@lucide/astro';
 ---
 
 <header class="border-b border-white/60 bg-black/95 backdrop-blur">
@@ -8,7 +8,9 @@ import { Github, Twitter, Link2 } from '@lucide/astro';
       <img src="/fm-og.jpg" alt="Loftwah" width="20" height="20" class="size-5 rounded-full border border-white object-cover" loading="eager" decoding="async" />
       Loftwah FM
     </a>
-    <div class="flex items-center gap-3 sm:gap-4 text-sm">
+    <!-- Desktop nav -->
+    <div class="hidden sm:flex items-center gap-4 text-sm">
+      <a class="hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="/guide/sunoai">Guide</a>
       <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://x.com/loftwah" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
         <Twitter size={14} />
         <span class="hidden sm:inline">X</span>
@@ -22,5 +24,42 @@ import { Github, Twitter, Link2 } from '@lucide/astro';
         <span class="hidden sm:inline">GitHub</span>
       </a>
     </div>
+    <!-- Mobile menu button -->
+    <button id="menu-button" type="button" class="sm:hidden inline-flex items-center gap-2 rounded-md border border-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" aria-haspopup="true" aria-expanded="false" aria-controls="mobile-menu">
+      <Menu size={16} aria-hidden="true" />
+      Menu
+    </button>
   </nav>
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="sm:hidden border-t border-white bg-black text-white" hidden>
+    <div class="mx-auto max-w-6xl px-4 py-3">
+      <ul class="flex flex-col gap-2 text-sm">
+        <li><a class="block w-full rounded-md border border-white px-3 py-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="/">Home</a></li>
+        <li><a class="block w-full rounded-md border border-white px-3 py-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="/guide/sunoai">Guide: SunoAI</a></li>
+        <li><a class="w-full rounded-md border border-white px-3 py-2 inline-flex items-center gap-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://x.com/loftwah" target="_blank" rel="noopener noreferrer"><Twitter size={14} /> X</a></li>
+        <li><a class="w-full rounded-md border border-white px-3 py-2 inline-flex items-center gap-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://linkarooie.com/loftwah" target="_blank" rel="noopener noreferrer"><Link2 size={14} /> Links</a></li>
+        <li><a class="w-full rounded-md border border-white px-3 py-2 inline-flex items-center gap-2 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://github.com/loftwah/loftwahfm" target="_blank" rel="noopener noreferrer"><Github size={14} /> GitHub</a></li>
+      </ul>
+    </div>
+  </div>
 </header>
+
+<script is:inline>
+  const menuButton = document.getElementById('menu-button');
+  const menu = document.getElementById('mobile-menu');
+  if (menuButton && menu) {
+    const setExpanded = (expanded) => {
+      menuButton.setAttribute('aria-expanded', String(expanded));
+      menu.hidden = !expanded;
+    };
+    const toggle = () => setExpanded(menu.hidden);
+    const onKeyDown = (e) => { if (e.key === 'Escape') setExpanded(false); };
+    menuButton.addEventListener('click', toggle);
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('click', (e) => {
+      if (!menu.hidden && !menu.contains(e.target) && e.target !== menuButton) {
+        setExpanded(false);
+      }
+    });
+  }
+</script>

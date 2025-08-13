@@ -1,0 +1,338 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead
+      title="Ultimate Guide and Cheatsheet to Custom Songs on Suno AI (v4.5)"
+      description="Latest practical guide for Suno AI v4.5: quick start, prompting structure, tags, instruments, recipes, new features, and troubleshooting."
+      image="/fm-og.jpg"
+      ogType="article"
+      ogAuthor="Loftwah"
+    />
+  </head>
+  <body>
+    <Header />
+    <main class="mx-auto max-w-3xl px-4 mt-6 mb-28 space-y-6">
+      <article class="max-w-none space-y-4">
+        <h1 class="text-2xl font-bold tracking-tight">Ultimate Guide and Cheatsheet to Custom Songs on Suno AI (Latest Version: v4.5, as of August 2025)</h1>
+        <p>Suno AI is a powerful tool for generating original music from text prompts, allowing anyone to create full songs with lyrics, vocals, and instrumentation. As of v4.5 (released in May 2025), Suno has significantly improved prompt adherence, voice quality, genre mashups, and song length (up to 8 minutes). It supports free access with daily credits (limited to approximately 10 songs per day on v3.5 or v4 models) and paid plans (Pro or Plus) for unlimited generations, access to v4.5, stems, editing tools, and more. You can use it via suno.com, the mobile app, or integrations.</p>
+        <p>This guide builds on community resources like the LoftwahFM Suno Playbook, incorporating updates from official releases, user tips from Reddit and X, and prompting best practices. It focuses on custom mode for maximum control, where you input lyrics and styles. For the easiest start, use simple mode: just describe your song (for example, "uplifting pop track about summer love") and let Suno generate everything.</p>
+
+        <h2 class="text-xl font-semibold mt-6">1. Quick Start: Generating Your First Custom Song</h2>
+        <ol class="list-decimal pl-5 space-y-3">
+          <li>
+            <strong>Pick a Base Style</strong>: Start simple to avoid overwhelming the AI. Reliable bases include:
+            <ul class="list-disc pl-5 mt-2 space-y-1">
+              <li>Boom bap + nylon guitar (simple, singable hip hop or rock blend).</li>
+              <li>Piano ballad (intimate, clean vocals).</li>
+              <li>Nu-groove (hip hop times rock grit + chant).</li>
+              <li>DnB song (half-time verse then double-time drop).</li>
+              <li>New in v4.5: Genre mashups like "punk rock with neosoul" or "EDM folk" for cohesive hybrids.</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Set a Header Line</strong>: At the top of your prompt, define tempo, key, vibe, and 3 to 6 instruments. This anchors the AI.
+            <div class="mt-2"><code class="inline-block bg-black border border-white px-2 py-1 text-xs">[Intro - 92 BPM, A minor; half-sung vocals; sub bass, muted guitar, crisp snare, sparse keys, vinyl crackle]</code></div>
+          </li>
+          <li><strong>Write Lyrics</strong>: Keep lines short (4 to 8 words) and singable. Use section tags for structure. Repeat hooks exactly for catchiness.</li>
+          <li><strong>Add Style and Tags</strong>: Describe genre, mood, and vocals in a separate field or inline. Use v4.5's Prompt Enhancement Helper: input rough tags (for example, "lofi chill female vocals"), select Enhance, and get a refined prompt.</li>
+          <li><strong>Generate and Refine</strong>: Select Create for two versions. Use thumbs up or down to train the AI. Extend songs up to 8 minutes, remix, or apply covers or personas for voice or style tweaks.</li>
+        </ol>
+        <p class="mt-2"><strong>Golden Rules (Updated for v4.5)</strong>:</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Fewer words, fewer instruments, more intent: avoid over-specifying to prevent muddy mixes. Aim for 3 to 6 key elements.</li>
+          <li>v4.5 is smarter: better interpretation of moods (for example, "nostalgic uplifting tones") and complex sounds (for example, "leaf textures in melodic whistling").</li>
+          <li>Avoid artist names: use style descriptors instead (for example, "80s pop with danceable beats").</li>
+          <li>Test in pieces: generate verses or choruses separately, then extend or remix.</li>
+        </ul>
+
+        <h2 class="text-xl font-semibold mt-6">2. Prompt Structure and Best Practices</h2>
+        <p>Suno prompts have two main parts: <strong>Style Description</strong> (genre, mood, instruments) and <strong>Lyrics</strong> (structured with tags). v4.5 adheres better to details, reducing hallucinations like rapping over melodic requests.</p>
+        <p class="mt-2"><strong>Basic Prompt Format</strong>:</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Style: "Genre, mood, key elements. Vocal style."</li>
+          <li>Lyrics: use [tags] for sections, vocals, and effects.</li>
+        </ul>
+        <p class="mt-2"><strong>Components for Effective Prompts</strong>:</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li><strong>Genre or Style</strong>: broad (pop) or specific (synthwave). Mashups work well in v4.5 (for example, "jazz house with gregorian chant").</li>
+          <li><strong>Mood or Emotion</strong>: uplifting, melancholic, gritty. Pair with actions (for example, "punchy drums building tension").</li>
+          <li><strong>Tempo and Key</strong>: hip hop 80 to 95 BPM; house 120 to 128 BPM; DnB 170 to 175 BPM. Minor feels moody; major feels bright. Use a bridge key lift for energy.</li>
+          <li><strong>Instruments</strong>: 3 to 6 maximum (for example, sub bass, reese bass for DnB). Specify playing style (for example, palm-muted guitar).</li>
+          <li><strong>Vocals</strong>: half-sung, chant hook, stacked harmonies. v4.5 supports emotional range (vibrato, whispers).</li>
+          <li><strong>Production</strong>: glossy mix, lo-fi crackle, side-chained bass.</li>
+        </ul>
+        <p class="mt-2"><strong>Advanced Tips</strong>:</p>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Use metatags inline for control: [beat drop], [riser]. Place sparingly like seasoning.</li>
+          <li>v4.5 sliders: adjust Weirdness (creativity), Structure (adherence to tags), Reference Driven (match uploaded audio).</li>
+          <li>Upload audio: extend from your riffs or tracks (up to 8 minutes). Use stems to extract vocals or drums for remixing.</li>
+          <li>Personas or covers: beta feature to replicate vocals from existing tracks. Combine with remixes (for example, rock to house).</li>
+        </ul>
+
+        <h2 class="text-xl font-semibold mt-6">3. Cheatsheet: Tags, Styles, Instruments, and More</h2>
+        <p>Use tables for quick reference. These build on LoftwahFM's playbook, updated with v4.5 capabilities and community tips (for example, from Reddit cheat sheets and X users).</p>
+
+        <h3 class="text-lg font-semibold mt-4">Section Tags</h3>
+        <table class="w-full text-left border border-white/60">
+          <thead>
+            <tr>
+              <th class="border-b border-white/60 p-2">Section Tags (structure your lyrics)</th>
+              <th class="border-b border-white/60 p-2">Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border-b border-white/30 p-2">Basic Structure</td>
+              <td class="border-b border-white/30 p-2">[Intro], [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]</td>
+            </tr>
+            <tr>
+              <td class="p-2">Advanced (v4.5)</td>
+              <td class="p-2">[Breakdown], [Build-Up], [Climax], [Fade Out] (new for seamless endings)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="text-lg font-semibold mt-6">Vocal Tags</h3>
+        <table class="w-full text-left border border-white/60">
+          <thead>
+            <tr>
+              <th class="border-b border-white/60 p-2">Vocal Tags (control singing style)</th>
+              <th class="border-b border-white/60 p-2">Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border-b border-white/30 p-2">Styles</td>
+              <td class="border-b border-white/30 p-2">half-sung vocals, melodic storytelling, chant hook, talk-sung, breathy, raspy male, soulful female, stacked harmonies, call-and-response, whispered doubles</td>
+            </tr>
+            <tr>
+              <td class="border-b border-white/30 p-2">Gender or Effects</td>
+              <td class="border-b border-white/30 p-2">[Male singer], [Female vocals], [Harmonized chorus], [Ad-lib: yeah], [Whisper: phrase], [Scream], [Breath]</td>
+            </tr>
+            <tr>
+              <td class="p-2">Tips</td>
+              <td class="p-2">For duets: [Verse 1: Male], [Chorus: Female duet]. Use quotation marks for spoken or emotional shifts (for example, (sung with sadness)). v4.5 adds vibrato and emotional depth.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="text-lg font-semibold mt-6">SFX and Arrangement Tokens</h3>
+        <table class="w-full text-left border border-white/60">
+          <thead>
+            <tr>
+              <th class="border-b border-white/60 p-2">SFX and Arrangement Tokens (exact spellings; use sparingly)</th>
+              <th class="border-b border-white/60 p-2">Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border-b border-white/30 p-2">Transitions</td>
+              <td class="border-b border-white/30 p-2">[beat drop], [riser] or [risers], [reverse swell], [tom build]</td>
+            </tr>
+            <tr>
+              <td class="border-b border-white/30 p-2">Textures</td>
+              <td class="border-b border-white/30 p-2">[vinyl crackle], [tape hiss], [record scratch], [radio chatter]</td>
+            </tr>
+            <tr>
+              <td class="border-b border-white/30 p-2">Crowd or Extras</td>
+              <td class="border-b border-white/30 p-2">[crowd chant: WORD], [applause], [birds chirping]</td>
+            </tr>
+            <tr>
+              <td class="border-b border-white/30 p-2">Arrangement</td>
+              <td class="border-b border-white/30 p-2">[drums mute 2 bars], [bass solo 1 bar], [crescendo] (increase volume), [diminuendo] (decrease), [instrumental opening]</td>
+            </tr>
+            <tr>
+              <td class="p-2">Tips</td>
+              <td class="p-2">For effects like DJ scratches: s s s s so so so susussssuuuu. v4.5 handles complex textures better (for example, leaf rustling).</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="text-lg font-semibold mt-6">Instrument and Texture Menu</h3>
+        <table class="w-full text-left border border-white/60">
+          <thead>
+            <tr>
+              <th class="border-b border-white/60 p-2">Instrument and Texture Menu (choose 3 to 6; v4.5 supports layering)</th>
+              <th class="border-b border-white/60 p-2">Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border-b border-white/30 p-2">Drums</td>
+              <td class="border-b border-white/30 p-2">boom bap kit with swing, crisp snare, tight clap, rim clicks, brushed kit, two-step break (DnB)</td>
+            </tr>
+            <tr>
+              <td class="border-b border-white/30 p-2">Bass</td>
+              <td class="border-b border-white/30 p-2">sub bass, 808 sustain, rubbery sub, plucked bass guitar, reese bass (DnB)</td>
+            </tr>
+            <tr>
+              <td class="border-b border-white/30 p-2">Guitars</td>
+              <td class="border-b border-white/30 p-2">muted electric, palm-muted chugs, nylon acoustic, clean tremolo, lo-fi chorus guitar</td>
+            </tr>
+            <tr>
+              <td class="border-b border-white/30 p-2">Keys or Synths</td>
+              <td class="border-b border-white/30 p-2">close-mic piano, Rhodes, sparse keys, plucky synth, warm pad, vocal-chop stabs, 8-bit lead</td>
+            </tr>
+            <tr>
+              <td class="border-b border-white/30 p-2">FX or Atmos</td>
+              <td class="border-b border-white/30 p-2">vinyl crackle, tape hiss, reverse swell, riser, record scratch, radio chatter</td>
+            </tr>
+            <tr>
+              <td class="p-2">Tips</td>
+              <td class="p-2">Pair with actions: punchy but sparse. Avoid more than 6 items to prevent muddy mixes.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="text-lg font-semibold mt-6">Off-Brand Style DNA</h3>
+        <table class="w-full text-left border border-white/60">
+          <thead>
+            <tr>
+              <th class="border-b border-white/60 p-2">Off-Brand Style DNA (metaphors instead of artists; 1 to 2 max)</th>
+              <th class="border-b border-white/60 p-2">Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border-b border-white/30 p-2">Hip Hop or Rock</td>
+              <td class="border-b border-white/30 p-2">Gangster chess match soundtrack (85 to 100 BPM, minor; deep sub, sharp snare, muted guitar, synth whistle)</td>
+            </tr>
+            <tr>
+              <td class="border-b border-white/30 p-2">R&amp;B</td>
+              <td class="border-b border-white/30 p-2">Alien-heartbeat R&amp;B (syncopated drums, vocal-chop stabs, rubbery sub, negative space)</td>
+            </tr>
+            <tr>
+              <td class="border-b border-white/30 p-2">Electronic</td>
+              <td class="border-b border-white/30 p-2">Ghosts in the strobe (progressive pads, side-chained bass, sparse plucks, late-night haze)</td>
+            </tr>
+            <tr>
+              <td class="border-b border-white/30 p-2">Retro</td>
+              <td class="border-b border-white/30 p-2">Neon-arcade boombap (8-bit lead, dusty drums, vinyl crackle, chantable hooks)</td>
+            </tr>
+            <tr>
+              <td class="p-2">Tips</td>
+              <td class="p-2">From community lists; correlate to artists (for example, dark cinematic RnB for The Weeknd vibes). v4.5 mashups: add with folk elements.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="text-lg font-semibold mt-6">Tempo and Key Cheat Sheet</h3>
+        <table class="w-full text-left border border-white/60">
+          <thead>
+            <tr>
+              <th class="border-b border-white/60 p-2">Tempo and Key Cheat Sheet</th>
+              <th class="border-b border-white/60 p-2">Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border-b border-white/30 p-2">Genres</td>
+              <td class="border-b border-white/30 p-2">Hip hop or boom bap: 80 to 95 BPM; Bounce: 100 to 115 BPM; House: 120 to 128 BPM; DnB: 170 to 175 BPM</td>
+            </tr>
+            <tr>
+              <td class="border-b border-white/30 p-2">Keys</td>
+              <td class="border-b border-white/30 p-2">Minor equals moody; Major equals uplifting; bridge key lift equals subtle energy bump</td>
+            </tr>
+            <tr>
+              <td class="p-2">Tips</td>
+              <td class="p-2">Evolve BPM in sections (for example, half-time verse to full drop in DnB).</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2 class="text-xl font-semibold mt-6">4. New Features in v4.5 (May 2025 Update)</h2>
+        <ul class="list-disc pl-5 space-y-1">
+          <li><strong>Longer Songs and Better Coherence</strong>: up to 8 minutes, maintains quality without degradation.</li>
+          <li><strong>Prompt Enhancement</strong>: turn vague ideas into detailed prompts (for example, "chill lofi" to full style with instruments).</li>
+          <li><strong>Stems and Editing</strong>: extract 12 stems (vocals, drums, and more). Reorder, rewrite, crop, and fade out in the waveform editor.</li>
+          <li><strong>Remix, Cover, Persona</strong>: upload tracks for remixing; switch genres while keeping melody. Combine for many variants.</li>
+          <li><strong>Faster and Smarter</strong>: quicker generations; better at complex prompts like "uplifting nostalgic tones with leaf textures".</li>
+          <li><strong>Audio Improvements</strong>: balanced mixes, reduced shimmer; upload full songs for extensions.</li>
+        </ul>
+
+        <h2 class="text-xl font-semibold mt-6">5. Troubleshooting and Pro Tips</h2>
+        <ul class="list-disc pl-5 space-y-2">
+          <li><strong>It Keeps Rapping</strong>: add "half-sung vocals" and "melodic storytelling", shorten lines, use tags. v4.5 is less prone.</li>
+          <li><strong>Too Busy or Muddy</strong>: limit to 3 to 4 instruments; request "minimal arrangement".</li>
+          <li><strong>Flat Chorus</strong>: add [stacked harmonies], [beat drop], and fills.</li>
+          <li><strong>DnB Generic</strong>: specify "two-step break and reese bass", contrast half-time and full-time.</li>
+          <li><strong>Voice Issues</strong>: generate sections separately; use thumbs down for bad takes. For non-English, phonetic lyrics help.</li>
+          <li><strong>Workflow Hacks</strong>: use ChatGPT or Claude for lyrics or prompts. Analyze songs with AI for BPM or styles. Remix viral tracks.</li>
+          <li><strong>Community Tips</strong>: from X and Reddit: simplify for AI (KISS method); use [Interlude] for instrumentals; thumbs up or down trains outputs.</li>
+        </ul>
+
+        <h2 class="text-xl font-semibold mt-6">6. Copy-Paste Recipes (Updated Examples)</h2>
+        <h3 class="text-lg font-semibold mt-2">1) Boom Bap + Nylon Guitar (v4.5 Enhanced)</h3>
+        <pre class="panel p-3 text-xs overflow-x-auto"><code>[Intro - 86 BPM, E minor; boom bap kit with swing, nylon acoustic, sub bass, rim clicks, vinyl crackle]
+[Verse 1 - half-sung, conversational; short lines with space]
+City hum, slow lights, easy pace
+Soft steps, your laugh, open face
+
+[Pre-Chorus - add sparse keys]
+Give me a sign, I will follow through
+
+[Chorus - chant hook, stacked harmonies, [beat drop]]
+Hold me close, do not overthink
+Two hearts slow, one steady blink
+Hold me close, do not overthink
+Two hearts slow, one steady blink
+
+[Bridge - drums mute, finger-picked guitar, [riser]]
+[Chorus]
+[Outro - fade out with tape hiss]</code></pre>
+        <p>Style: "Clean singable hip hop with nostalgic tones."</p>
+
+        <h3 class="text-lg font-semibold mt-4">2) Piano Ballad (Intimate)</h3>
+        <pre class="panel p-3 text-xs overflow-x-auto"><code>[Intro - 90 BPM, C major; close-mic piano, brush kit, soft strings pad]
+[Verse 1 - breathy, melodic storytelling]
+
+[Chorus - octave piano, light harmonies, reverse swell]
+Say my name, keep the lights low
+In this room where the soft winds blow
+
+[Bridge - [diminuendo], vocal whispers]
+[Chorus]
+[Outro - fade out]</code></pre>
+        <p>Style: "Emotional soulful ballad with textured piano layers."</p>
+
+        <h3 class="text-lg font-semibold mt-4">3) Nu-Groove Mashup (Hip Hop times Rock)</h3>
+        <pre class="panel p-3 text-xs overflow-x-auto"><code>[Intro - 92 BPM, E minor; palm-muted guitar over hip hop drums, sub bass]
+[Verse 1 - talk-sung; percussive phrasing]
+[Chorus - anthemic chant; doubled vocals, [beat drop]]
+[Bridge - tom build and guitar harmonics, genre mashup with neosoul elements]</code></pre>
+        <p>Style: "Gritty nu-groove with emotional depth."</p>
+
+        <h3 class="text-lg font-semibold mt-4">4) DnB Vocal (High-Energy)</h3>
+        <pre class="panel p-3 text-xs overflow-x-auto"><code>[Intro - 174 BPM, F# minor; atmospheric pads, filtered two-step break, reese tease]
+[Verse 1 - half-time over minimal drums]
+[Chorus - full DnB drop; reese bass, tight hats, vibrato vocals]
+[Breakdown - pad and vocal chops]
+[Chorus]
+[Outro - fade out with riser echo]</code></pre>
+        <p>Style: "Energetic DnB with complex sound textures."</p>
+
+        <h2 class="text-xl font-semibold mt-6">Authoring Checklist</h2>
+        <ul class="list-disc pl-5 space-y-1">
+          <li>Header: BPM and key and vibe and 3 to 6 instruments.</li>
+          <li>Sections: labeled; hook repeated.</li>
+          <li>Vocals: specify half-sung or chant if melodic.</li>
+          <li>Styles: 1 to 2 metaphors maximum.</li>
+          <li>SFX: placed for impact.</li>
+          <li>Trim: remove vague adjectives; add specifics.</li>
+          <li>v4.5: use enhancement helper; test sliders for weirdness or structure.</li>
+        </ul>
+
+        <p class="mt-4">For more, explore Suno's blog or Reddit communities. Experiment. v4.5 rewards creativity. If generating images (for example, for album art), confirm first.</p>
+      </article>
+    </main>
+    <Footer />
+  </body>
+  </html>
+
+
