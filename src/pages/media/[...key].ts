@@ -168,6 +168,9 @@ async function resolveExistingKey(
   candidates.push(`media/${withoutMedia}`);
   // 3) stripped media/ if present
   if (noLead.startsWith("media/")) candidates.push(withoutMedia);
+  // 4) previously mis-synced with bucket name prefixes
+  candidates.push(`loftwahfm-dev/${withoutMedia}`);
+  candidates.push(`loftwahfm/${withoutMedia}`);
 
   for (const candidate of dedupe(candidates)) {
     const head = await bucket.head(candidate);
