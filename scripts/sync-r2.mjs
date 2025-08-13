@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { execSync } from "node:child_process";
-import { readdirSync, statSync, readFileSync, writeFileSync } from "node:fs";
+import { readdirSync, statSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
@@ -19,6 +19,12 @@ try {
 } catch {
   cache = {};
 }
+// If the media root does not exist (e.g., CI without the optional music folder), skip sync gracefully
+if (!existsSync(mediaRoot)) {
+  console.log('No "music" folder found; skipping R2 sync.');
+  process.exit(0);
+}
+
 const albumsOnDisk = readdirSync(mediaRoot, { withFileTypes: true })
   .filter((d) => d.isDirectory())
   .map((d) => d.name)
