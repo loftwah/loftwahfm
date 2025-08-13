@@ -56,7 +56,10 @@ export function AlbumCard({
   const copyLink = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      const absolute = typeof window !== "undefined" ? new URL(albumHref, window.location.href).toString() : albumHref;
+      const absolute =
+        typeof window !== "undefined"
+          ? new URL(albumHref, window.location.href).toString()
+          : albumHref;
       await navigator.clipboard.writeText(absolute);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1400);

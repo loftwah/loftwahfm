@@ -35,7 +35,10 @@ export function NowPlaying({ album, item, coverUrl }: NowPlayingProps) {
 
   const copyLink = async () => {
     try {
-      const absolute = typeof window !== "undefined" ? new URL(shareUrl, window.location.href).toString() : shareUrl;
+      const absolute =
+        typeof window !== "undefined"
+          ? new URL(shareUrl, window.location.href).toString()
+          : shareUrl;
       await navigator.clipboard.writeText(absolute);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1400);
@@ -66,23 +69,25 @@ export function NowPlaying({ album, item, coverUrl }: NowPlayingProps) {
             {item.title} · {album.artist}
           </div>
         </div>
-        <div className="ml-auto flex items-center gap-2">
-          <a
-            href={shareUrl}
-            className="btn text-xs inline-flex items-center gap-1"
-            title="Open shareable link"
-          >
-            <LinkIcon size={14} /> Link
-          </a>
-          <button
-            className="btn text-xs inline-flex items-center gap-1"
-            onClick={copyLink}
-            title="Copy link to clipboard"
-          >
-            {copied ? <CheckIcon size={14} /> : <CopyIcon size={14} />}{" "}
-            {copied ? "Copied" : "Copy"}
-          </button>
-        </div>
+        {album.slug !== "playlist" ? (
+          <div className="ml-auto flex items-center gap-2">
+            <a
+              href={shareUrl}
+              className="btn text-xs inline-flex items-center gap-1"
+              title="Open shareable link"
+            >
+              <LinkIcon size={14} /> Link
+            </a>
+            <button
+              className="btn text-xs inline-flex items-center gap-1"
+              onClick={copyLink}
+              title="Copy link to clipboard"
+            >
+              {copied ? <CheckIcon size={14} /> : <CopyIcon size={14} />}{" "}
+              {copied ? "Copied" : "Copy"}
+            </button>
+          </div>
+        ) : null}
       </div>
     </div>
   );
