@@ -35,10 +35,15 @@ export function AlbumCard({
   const initialSrc = album.cover?.startsWith("/")
     ? album.cover
     : album.slug === "all" || album.slug === "playlist"
-      ? (album.slug === "all" ? "/all-songs.jpg" : "/playlist.jpg")
+      ? album.slug === "all"
+        ? "/all-songs.jpg"
+        : "/playlist.jpg"
       : `/media/${album.slug}/${encodeURIComponent(album.cover)}`;
   const [imgSrc, setImgSrc] = useState(initialSrc);
-  const [playlistCounts, setPlaylistCounts] = useState<{ tracks: number; videos: number }>({ tracks: 0, videos: 0 });
+  const [playlistCounts, setPlaylistCounts] = useState<{
+    tracks: number;
+    videos: number;
+  }>({ tracks: 0, videos: 0 });
 
   useEffect(() => {
     if (album.slug !== "playlist") return;
@@ -109,12 +114,20 @@ export function AlbumCard({
         <p className="text-xs text-white/60 flex items-center gap-3">
           <span className="inline-flex items-center gap-1">
             <Music2 size={12} />
-            {album.slug === "playlist" ? playlistCounts.tracks : album.tracks?.length ?? 0}
+            {album.slug === "playlist"
+              ? playlistCounts.tracks
+              : (album.tracks?.length ?? 0)}
           </span>
-          {(album.slug === "playlist" ? playlistCounts.videos : album.videos?.length || 0) ? (
+          {(
+            album.slug === "playlist"
+              ? playlistCounts.videos
+              : album.videos?.length || 0
+          ) ? (
             <span className="inline-flex items-center gap-1">
               <VideoIcon size={12} />
-              {album.slug === "playlist" ? playlistCounts.videos : album.videos?.length ?? 0}
+              {album.slug === "playlist"
+                ? playlistCounts.videos
+                : (album.videos?.length ?? 0)}
             </span>
           ) : null}
         </p>

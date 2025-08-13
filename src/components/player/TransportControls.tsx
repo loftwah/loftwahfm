@@ -128,7 +128,11 @@ export function TransportControls(props: TransportControlsProps) {
           )}
         </button>
         <span className="text-xs opacity-80 hidden sm:inline" aria-hidden>
-          {repeat === "one" ? "Repeat one" : repeat === "all" ? "Repeat all" : "Repeat off"}
+          {repeat === "one"
+            ? "Repeat one"
+            : repeat === "all"
+              ? "Repeat all"
+              : "Repeat off"}
         </span>
         {rightSlot}
       </div>

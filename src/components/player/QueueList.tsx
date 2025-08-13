@@ -27,6 +27,7 @@ interface QueueListProps {
   onRemoveFromPlaylist?: (index: number) => void;
   onMoveUp?: (index: number) => void;
   onMoveDown?: (index: number) => void;
+  highlightIndex?: number | null;
 }
 
 export function QueueList({
@@ -38,7 +39,23 @@ export function QueueList({
   onRemoveFromPlaylist,
   onMoveUp,
   onMoveDown,
+  highlightIndex,
 }: QueueListProps) {
+  const [highlight, setHighlight] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    const onMoved = (e: Event) => {
+      const idx = (e as CustomEvent<number>).detail;
+      if (typeof idx === "number") {
+        setHighlight(idx);
+        window.setTimeout(() => setHighlight(null), 600);
+      }
+    };
+    window.addEventListener("lfm-row-moved", onMoved as EventListener);
+    return () =>
+      window.removeEventListener("lfm-row-moved", onMoved as EventListener);
+  }, []);
+
   return (
     <ol
       className="divide-y divide-white/40 border border-white/40 rounded-sm overflow-hidden select-none"
@@ -49,6 +66,11 @@ export function QueueList({
         const downloadHref = q.albumSlug
           ? `/media/${q.albumSlug}/${encodeURIComponent(q.file)}`
           : undefined;
+        const isFirst = i === 0;
+        const isLast = i === items.length - 1;
+        const isHighlighted =
+          (typeof highlightIndex === "number" && highlightIndex === i) ||
+          highlight === i;
         return (
           <li
             key={`${q.kind}:${q.file}`}
@@ -56,7 +78,9 @@ export function QueueList({
             role="option"
             aria-selected={i === activeIndex}
           >
-            <div className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white hover:text-black transition-colors">
+            <div
+              className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white hover:text-black transition-colors ${isHighlighted ? "ring-2 ring-white" : ""}`}
+            >
               <button
                 className="flex items-center gap-3 flex-1 min-w-0 text-left"
                 onClick={() => onSelect(i)}
@@ -136,26 +160,28 @@ export function QueueList({
               ) : null}
               {onMoveUp ? (
                 <button
-                  className="ml-2 inline-flex items-center text-current/80 hover:text-current shrink-0"
+                  className={`ml-2 inline-flex items-center shrink-0 ${isFirst ? "opacity-40 cursor-not-allowed" : "text-current/80 hover:text-current"}`}
+                  disabled={isFirst}
                   onClick={(e) => {
                     e.stopPropagation();
                     onMoveUp(i);
                   }}
-                  aria-label={`Move ${q.title} up`}
-                  title="Move up"
+                  aria-label={`Move ${q.title} up. New position ${i}`}
+                  title={`Move up (to ${i})`}
                 >
                   <ArrowUp size={16} />
                 </button>
               ) : null}
               {onMoveDown ? (
                 <button
-                  className="ml-1 inline-flex items-center text-current/80 hover:text-current shrink-0"
+                  className={`ml-1 inline-flex items-center shrink-0 ${isLast ? "opacity-40 cursor-not-allowed" : "text-current/80 hover:text-current"}`}
+                  disabled={isLast}
                   onClick={(e) => {
                     e.stopPropagation();
                     onMoveDown(i);
                   }}
-                  aria-label={`Move ${q.title} down`}
-                  title="Move down"
+                  aria-label={`Move ${q.title} down. New position ${i + 2}`}
+                  title={`Move down (to ${i + 2})`}
                 >
                   <ArrowDown size={16} />
                 </button>

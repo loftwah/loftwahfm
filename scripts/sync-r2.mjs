@@ -5,7 +5,10 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const env = process.argv[2] === "prod" ? "prod" : "dev";
-const cachePath = join(root, env === "prod" ? ".r2-sync-cache.prod.json" : ".r2-sync-cache.dev.json");
+const cachePath = join(
+  root,
+  env === "prod" ? ".r2-sync-cache.prod.json" : ".r2-sync-cache.dev.json",
+);
 let cache = {};
 try {
   cache = JSON.parse(readFileSync(cachePath, "utf8"));
@@ -70,9 +73,7 @@ for (const slug of albumsOnDisk) {
         continue;
       }
       // Upload
-      sh(
-        `npx --yes wrangler r2 object put "${key}" --file "${file}"`,
-      );
+      sh(`npx --yes wrangler r2 object put "${key}" --file "${file}"`);
       cache.objects[key] = { size: st.size, mtimeMs: st.mtimeMs };
     }
   } catch (e) {

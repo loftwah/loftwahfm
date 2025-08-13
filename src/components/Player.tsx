@@ -90,10 +90,18 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     if (selectedSlug === "playlist") {
       const tracks = playlistItems
         .filter((i) => i.kind === "audio")
-        .map((t) => ({ title: t.title, file: t.file, durationSec: t.durationSec }));
+        .map((t) => ({
+          title: t.title,
+          file: t.file,
+          durationSec: t.durationSec,
+        }));
       const videos = playlistItems
         .filter((i) => i.kind === "video")
-        .map((v) => ({ title: v.title, file: v.file, poster: (v as any).poster }));
+        .map((v) => ({
+          title: v.title,
+          file: v.file,
+          poster: (v as any).poster,
+        }));
       return {
         slug: "playlist",
         title: "My Playlist",
@@ -121,7 +129,8 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   const queue = useMemo(() => {
     if (!album) return [] as QueueItem[];
     // Helper to generate a unique/stable key for items
-    const keyForItem = (it: QueueItem) => `${it.albumSlug}:${it.kind}:${it.file}`;
+    const keyForItem = (it: QueueItem) =>
+      `${it.albumSlug}:${it.kind}:${it.file}`;
     // Read saved order from localStorage for a given slug
     const readOrder = (slug: string): string[] => {
       try {
@@ -226,17 +235,20 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   const addToPlaylist = (item: QueueItem) => {
     try {
       const raw = localStorage.getItem("lfm.playlist");
-      const items = raw ? ((JSON.parse(raw).items as QueueItem[]) || []) : [];
+      const items = raw ? (JSON.parse(raw).items as QueueItem[]) || [] : [];
       // Avoid duplicate exact same file within same album positionally adjacent? Allow duplicates but this avoids immediate dup
       const last = items[items.length - 1];
-      const next = last && last.file === item.file && last.albumSlug === item.albumSlug ? items : [...items, item];
+      const next =
+        last && last.file === item.file && last.albumSlug === item.albumSlug
+          ? items
+          : [...items, item];
       persistPlaylist(next);
     } catch {}
   };
   const removeFromPlaylist = (i: number) => {
     try {
       const raw = localStorage.getItem("lfm.playlist");
-      const items = raw ? ((JSON.parse(raw).items as QueueItem[]) || []) : [];
+      const items = raw ? (JSON.parse(raw).items as QueueItem[]) || [] : [];
       const next = items.slice(0, i).concat(items.slice(i + 1));
       persistPlaylist(next);
     } catch {}
@@ -245,7 +257,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     if (i <= 0) return;
     try {
       const raw = localStorage.getItem("lfm.playlist");
-      const items = raw ? ((JSON.parse(raw).items as QueueItem[]) || []) : [];
+      const items = raw ? (JSON.parse(raw).items as QueueItem[]) || [] : [];
       const copy = items.slice();
       const tmp = copy[i - 1];
       copy[i - 1] = copy[i];
@@ -256,7 +268,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   const moveDown = (i: number) => {
     try {
       const raw = localStorage.getItem("lfm.playlist");
-      const items = raw ? ((JSON.parse(raw).items as QueueItem[]) || []) : [];
+      const items = raw ? (JSON.parse(raw).items as QueueItem[]) || [] : [];
       if (i >= items.length - 1) return;
       const copy = items.slice();
       const tmp = copy[i + 1];
@@ -273,10 +285,19 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     // Playlist uses its own persistence; skip here
     if (album.slug === "playlist") return;
     const slug = album.slug; // album slug or "all"
-    const keyForItem = (it: QueueItem) => `${it.albumSlug}:${it.kind}:${it.file}`;
-    const currentKey = (queue[index] ? keyForItem(queue[index] as QueueItem) : null);
+    const keyForItem = (it: QueueItem) =>
+      `${it.albumSlug}:${it.kind}:${it.file}`;
+    const currentKey = queue[index]
+      ? keyForItem(queue[index] as QueueItem)
+      : null;
     const keys = queue.map((it) => keyForItem(it as QueueItem));
-    if (fromIndex < 0 || toIndex < 0 || fromIndex >= keys.length || toIndex >= keys.length) return;
+    if (
+      fromIndex < 0 ||
+      toIndex < 0 ||
+      fromIndex >= keys.length ||
+      toIndex >= keys.length
+    )
+      return;
     const copy = keys.slice();
     const [moved] = copy.splice(fromIndex, 1);
     copy.splice(toIndex, 0, moved);
@@ -289,6 +310,11 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
       }
       try {
         window.dispatchEvent(new Event("lfm-order-updated"));
+        const movedTo = toIndex;
+        const announceMsg = `Moved to position ${movedTo + 1}`;
+        if (liveRef.current) {
+          liveRef.current.textContent = announceMsg;
+        }
       } catch {}
     } catch {}
   };
@@ -297,11 +323,17 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     if (selectedSlug === "playlist") return moveUp(i);
     if (i <= 0) return;
     reorderWithinCurrentView(i, i - 1);
+    try {
+      window.dispatchEvent(new CustomEvent("lfm-row-moved", { detail: i - 1 }));
+    } catch {}
   };
   const moveDownGeneric = (i: number) => {
     if (selectedSlug === "playlist") return moveDown(i);
     if (i >= queue.length - 1) return;
     reorderWithinCurrentView(i, i + 1);
+    try {
+      window.dispatchEvent(new CustomEvent("lfm-row-moved", { detail: i + 1 }));
+    } catch {}
   };
 
   const doPlay = async () => {
@@ -428,7 +460,10 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     window.addEventListener("lfm-playlist-updated", onPlaylistUpdated as any);
     return () => {
       window.removeEventListener("storage", onStorage);
-      window.removeEventListener("lfm-playlist-updated", onPlaylistUpdated as any);
+      window.removeEventListener(
+        "lfm-playlist-updated",
+        onPlaylistUpdated as any,
+      );
     };
   }, []);
 
@@ -567,8 +602,12 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
             setIndex(i);
             if (!isPlaying) doPlay();
           }}
-          onAddToPlaylist={selectedSlug !== "playlist" ? addToPlaylist : undefined}
-          onRemoveFromPlaylist={selectedSlug === "playlist" ? removeFromPlaylist : undefined}
+          onAddToPlaylist={
+            selectedSlug !== "playlist" ? addToPlaylist : undefined
+          }
+          onRemoveFromPlaylist={
+            selectedSlug === "playlist" ? removeFromPlaylist : undefined
+          }
           onMoveUp={moveUpGeneric}
           onMoveDown={moveDownGeneric}
         />
