@@ -4,7 +4,8 @@ import { readdirSync, statSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
-const cachePath = join(root, ".r2-sync-cache.json");
+const env = process.argv[2] === "prod" ? "prod" : "dev";
+const cachePath = join(root, env === "prod" ? ".r2-sync-cache.prod.json" : ".r2-sync-cache.dev.json");
 let cache = {};
 try {
   cache = JSON.parse(readFileSync(cachePath, "utf8"));
@@ -30,9 +31,8 @@ const albumsOnDisk = readdirSync(root, { withFileTypes: true })
       ].includes(name),
   );
 
-const env = process.argv[2] === "prod" ? "prod" : "dev";
 const bucket = env === "prod" ? "loftwahfm" : "loftwahfm-dev";
-if (!cache[env]) cache[env] = {};
+if (!cache.objects) cache.objects = {};
 
 function listFilesRecursive(dir) {
   const out = [];
@@ -64,17 +64,16 @@ for (const slug of albumsOnDisk) {
       const base = file.substring(file.lastIndexOf("/") + 1);
       const key = `${bucket}/${slug}/${base}`;
       const st = statSync(file);
-      const prev = cache[env][key];
+      const prev = cache.objects[key];
       if (prev && prev.size === st.size && prev.mtimeMs === st.mtimeMs) {
-        // unchanged; skip upload
         console.log(`Skip unchanged: ${key}`);
-      } else {
-        // Use --remote so preview (which runs remotely) sees the same objects
-        sh(
-          `npx --yes wrangler r2 object put "${key}" --file "${file}" --remote`,
-        );
-        cache[env][key] = { size: st.size, mtimeMs: st.mtimeMs };
+        continue;
       }
+      // Upload
+      sh(
+        `npx --yes wrangler r2 object put "${key}" --file "${file}"`,
+      );
+      cache.objects[key] = { size: st.size, mtimeMs: st.mtimeMs };
     }
   } catch (e) {
     // Skip non-folders

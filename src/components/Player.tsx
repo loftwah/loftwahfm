@@ -84,21 +84,10 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
       } as AlbumData;
     }
     if (selectedSlug === "playlist") {
-      // Virtual album backed by localStorage
-      const stored = (() => {
-        try {
-          const raw = localStorage.getItem("lfm.playlist");
-          if (!raw) return null;
-          return JSON.parse(raw) as { items: QueueItem[] };
-        } catch {
-          return null;
-        }
-      })();
-      const items = stored?.items || [];
-      const tracks = items
+      const tracks = playlistItems
         .filter((i) => i.kind === "audio")
         .map((t) => ({ title: t.title, file: t.file, durationSec: t.durationSec }));
-      const videos = items
+      const videos = playlistItems
         .filter((i) => i.kind === "video")
         .map((v) => ({ title: v.title, file: v.file, poster: (v as any).poster }));
       return {
@@ -116,7 +105,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     if (!found) return null;
     // Default artist fallback
     return { ...found, artist: found.artist || "Loftwah" } as AlbumData;
-  }, [albums, selectedSlug, playlistVersion]);
+  }, [albums, selectedSlug, playlistVersion, playlistItems]);
   // Always fetch media via the Worker route that proxies R2
   const base = album ? `/media/${album.slug}` : "";
   // Lookup for per-album cover by slug
@@ -133,16 +122,10 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
       return q;
     }
     if (album.slug === "playlist") {
-      try {
-        const raw = localStorage.getItem("lfm.playlist");
-        const items = raw ? (JSON.parse(raw).items as QueueItem[]) : [];
-        return items;
-      } catch {
-        return [] as QueueItem[];
-      }
+      return playlistItems;
     }
     return buildQueue(album);
-  }, [album, albums, playlistVersion]);
+  }, [album, albums, playlistVersion, playlistItems]);
   const [index, setIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [shuffle, setShuffle] = useState(false);
@@ -151,6 +134,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [playlistVersion, setPlaylistVersion] = useState(0);
+  const [playlistItems, setPlaylistItems] = useState<QueueItem[]>([]);
   const mediaRef = useRef<
     HTMLAudioElement &
       HTMLVideoElement & { pause: () => void; play: () => Promise<void> }
@@ -196,6 +180,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     try {
       localStorage.setItem("lfm.playlist", JSON.stringify({ items }));
       setPlaylistVersion((v) => v + 1);
+      setPlaylistItems(items);
       try {
         window.dispatchEvent(new Event("lfm-playlist-updated"));
       } catch {}
@@ -345,11 +330,25 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   }, [current?.albumSlug, album?.slug]);
   // Refresh playlist-based views when the playlist changes elsewhere
   useEffect(() => {
+    const read = () => {
+      try {
+        const raw = localStorage.getItem("lfm.playlist");
+        const items = raw ? (JSON.parse(raw).items as QueueItem[]) : [];
+        setPlaylistItems(items);
+      } catch {}
+    };
+    read();
     const onStorage = (e: StorageEvent) => {
-      if (e.key === "lfm.playlist") setPlaylistVersion((v) => v + 1);
+      if (e.key === "lfm.playlist") {
+        setPlaylistVersion((v) => v + 1);
+        read();
+      }
     };
     window.addEventListener("storage", onStorage);
-    const onPlaylistUpdated = () => setPlaylistVersion((v) => v + 1);
+    const onPlaylistUpdated = () => {
+      setPlaylistVersion((v) => v + 1);
+      read();
+    };
     window.addEventListener("lfm-playlist-updated", onPlaylistUpdated as any);
     return () => {
       window.removeEventListener("storage", onStorage);
