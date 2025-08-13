@@ -73,6 +73,8 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   const [selectedSlug, setSelectedSlug] = useState<string>(initialSlug);
   const [playlistVersion, setPlaylistVersion] = useState(0);
   const [playlistItems, setPlaylistItems] = useState<QueueItem[]>([]);
+  // Bump this whenever a saved order for an album or All Songs changes
+  const [orderVersion, setOrderVersion] = useState(0);
   const album = useMemo(() => {
     if (selectedSlug === "all") {
       return {
@@ -118,16 +120,51 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   }, [albums]);
   const queue = useMemo(() => {
     if (!album) return [] as QueueItem[];
+    // Helper to generate a unique/stable key for items
+    const keyForItem = (it: QueueItem) => `${it.albumSlug}:${it.kind}:${it.file}`;
+    // Read saved order from localStorage for a given slug
+    const readOrder = (slug: string): string[] => {
+      try {
+        const raw = localStorage.getItem(`lfm.order.${slug}`);
+        if (!raw) return [];
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? (arr as string[]) : [];
+      } catch {
+        return [];
+      }
+    };
+    // Apply saved order to a queue without losing unknown items (append them)
+    const applySavedOrder = (slug: string, items: QueueItem[]): QueueItem[] => {
+      const saved = readOrder(slug);
+      if (!saved.length) return items;
+      const map = new Map<string, QueueItem>();
+      for (const it of items) map.set(keyForItem(it), it);
+      const ordered: QueueItem[] = [];
+      for (const k of saved) {
+        const it = map.get(k);
+        if (it) {
+          ordered.push(it);
+          map.delete(k);
+        }
+      }
+      // Append any items that weren't in the saved list, keeping original relative order
+      for (const it of items) {
+        const k = keyForItem(it);
+        if (map.has(k)) ordered.push(it);
+      }
+      return ordered;
+    };
+
     if (album.slug === "all") {
       const q: QueueItem[] = [];
       for (const a of albums) q.push(...buildQueue(a));
-      return q;
+      return applySavedOrder("all", q);
     }
     if (album.slug === "playlist") {
       return playlistItems;
     }
-    return buildQueue(album);
-  }, [album, albums, playlistVersion, playlistItems]);
+    return applySavedOrder(album.slug, buildQueue(album));
+  }, [album, albums, playlistVersion, playlistItems, orderVersion]);
   const [index, setIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [shuffle, setShuffle] = useState(false);
@@ -227,6 +264,44 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
       copy[i] = tmp;
       persistPlaylist(copy);
     } catch {}
+  };
+
+  // Generic queue reordering for Album and All Songs views (persisted per view)
+  const reorderWithinCurrentView = (fromIndex: number, toIndex: number) => {
+    if (!album) return;
+    if (fromIndex === toIndex) return;
+    // Playlist uses its own persistence; skip here
+    if (album.slug === "playlist") return;
+    const slug = album.slug; // album slug or "all"
+    const keyForItem = (it: QueueItem) => `${it.albumSlug}:${it.kind}:${it.file}`;
+    const currentKey = (queue[index] ? keyForItem(queue[index] as QueueItem) : null);
+    const keys = queue.map((it) => keyForItem(it as QueueItem));
+    if (fromIndex < 0 || toIndex < 0 || fromIndex >= keys.length || toIndex >= keys.length) return;
+    const copy = keys.slice();
+    const [moved] = copy.splice(fromIndex, 1);
+    copy.splice(toIndex, 0, moved);
+    try {
+      localStorage.setItem(`lfm.order.${slug}`, JSON.stringify(copy));
+      setOrderVersion((v) => v + 1);
+      if (currentKey) {
+        const ni = copy.indexOf(currentKey);
+        if (ni >= 0) setIndex(ni);
+      }
+      try {
+        window.dispatchEvent(new Event("lfm-order-updated"));
+      } catch {}
+    } catch {}
+  };
+
+  const moveUpGeneric = (i: number) => {
+    if (selectedSlug === "playlist") return moveUp(i);
+    if (i <= 0) return;
+    reorderWithinCurrentView(i, i - 1);
+  };
+  const moveDownGeneric = (i: number) => {
+    if (selectedSlug === "playlist") return moveDown(i);
+    if (i >= queue.length - 1) return;
+    reorderWithinCurrentView(i, i + 1);
   };
 
   const doPlay = async () => {
@@ -493,8 +568,8 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
           }}
           onAddToPlaylist={selectedSlug !== "playlist" ? addToPlaylist : undefined}
           onRemoveFromPlaylist={selectedSlug === "playlist" ? removeFromPlaylist : undefined}
-          onMoveUp={selectedSlug === "playlist" ? moveUp : undefined}
-          onMoveDown={selectedSlug === "playlist" ? moveDown : undefined}
+          onMoveUp={moveUpGeneric}
+          onMoveDown={moveDownGeneric}
         />
 
         {/* Lyrics */}
