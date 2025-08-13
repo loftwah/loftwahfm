@@ -6,3 +6,11 @@ interface Env {
 declare namespace App {
   interface Locals extends Runtime {}
 }
+
+declare global {
+  interface Window {
+    deferredPWAInstallPrompt?: Event;
+  }
+}
+
+export {};

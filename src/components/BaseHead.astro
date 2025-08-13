@@ -87,6 +87,21 @@ const siteLogoURL = new URL('/android-chrome-512x512.png', siteOrigin);
     logo: String(siteLogoURL),
   })}
   </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+  // Prompt install banner for supporting browsers
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    window.deferredPWAInstallPrompt = e;
+  });
+  window.addEventListener('appinstalled', () => {
+    window.deferredPWAInstallPrompt = undefined;
+  });
+  </script>
 <script type="application/ld+json">
   {JSON.stringify({
     '@context': 'https://schema.org',
