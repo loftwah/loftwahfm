@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Music2, Video as VideoIcon } from "lucide-react";
 
 export interface TrackItem {
@@ -34,8 +34,39 @@ export function AlbumCard({
 }) {
   const initialSrc = album.cover?.startsWith("/")
     ? album.cover
-    : `/media/${album.slug}/${encodeURIComponent(album.cover)}`;
+    : album.slug === "all" || album.slug === "playlist"
+      ? album.slug === "all"
+        ? "/all-songs.jpg"
+        : "/playlist.jpg"
+      : `/media/${album.slug}/${encodeURIComponent(album.cover)}`;
   const [imgSrc, setImgSrc] = useState(initialSrc);
+  const [playlistCounts, setPlaylistCounts] = useState<{
+    tracks: number;
+    videos: number;
+  }>({ tracks: 0, videos: 0 });
+
+  useEffect(() => {
+    if (album.slug !== "playlist") return;
+    const read = () => {
+      try {
+        const raw = localStorage.getItem("lfm.playlist");
+        const items = raw ? (JSON.parse(raw).items as any[]) : [];
+        const tracks = items.filter((i) => i && i.kind === "audio").length;
+        const videos = items.filter((i) => i && i.kind === "video").length;
+        setPlaylistCounts({ tracks, videos });
+      } catch {
+        setPlaylistCounts({ tracks: 0, videos: 0 });
+      }
+    };
+    read();
+    const onUpdate = () => read();
+    window.addEventListener("lfm-playlist-updated", onUpdate as any);
+    window.addEventListener("storage", onUpdate);
+    return () => {
+      window.removeEventListener("lfm-playlist-updated", onUpdate as any);
+      window.removeEventListener("storage", onUpdate);
+    };
+  }, [album.slug]);
   return (
     <button
       className="panel w-full text-left overflow-hidden !p-0 hover:bg-white/10"
@@ -61,7 +92,13 @@ export function AlbumCard({
         <img
           src={imgSrc}
           onError={() =>
-            setImgSrc(album.slug === "all" ? "/all-songs.jpg" : "/fm-og.jpg")
+            setImgSrc(
+              album.slug === "all"
+                ? "/all-songs.jpg"
+                : album.slug === "playlist"
+                  ? "/playlist.jpg"
+                  : "/fm-og.jpg",
+            )
           }
           alt={`${album.title} cover`}
           className="h-full w-full object-cover"
@@ -76,11 +113,21 @@ export function AlbumCard({
         <p className="text-sm text-white/80">{album.artist || "Loftwah"}</p>
         <p className="text-xs text-white/60 flex items-center gap-3">
           <span className="inline-flex items-center gap-1">
-            <Music2 size={12} /> {album.tracks.length}
+            <Music2 size={12} />
+            {album.slug === "playlist"
+              ? playlistCounts.tracks
+              : (album.tracks?.length ?? 0)}
           </span>
-          {album.videos?.length ? (
+          {(
+            album.slug === "playlist"
+              ? playlistCounts.videos
+              : album.videos?.length || 0
+          ) ? (
             <span className="inline-flex items-center gap-1">
-              <VideoIcon size={12} /> {album.videos.length}
+              <VideoIcon size={12} />
+              {album.slug === "playlist"
+                ? playlistCounts.videos
+                : (album.videos?.length ?? 0)}
             </span>
           ) : null}
         </p>

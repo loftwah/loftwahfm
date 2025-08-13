@@ -71,6 +71,10 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     }
   })();
   const [selectedSlug, setSelectedSlug] = useState<string>(initialSlug);
+  const [playlistVersion, setPlaylistVersion] = useState(0);
+  const [playlistItems, setPlaylistItems] = useState<QueueItem[]>([]);
+  // Bump this whenever a saved order for an album or All Songs changes
+  const [orderVersion, setOrderVersion] = useState(0);
   const album = useMemo(() => {
     if (selectedSlug === "all") {
       return {
@@ -83,12 +87,37 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
         videos: [],
       } as AlbumData;
     }
+    if (selectedSlug === "playlist") {
+      const tracks = playlistItems
+        .filter((i) => i.kind === "audio")
+        .map((t) => ({
+          title: t.title,
+          file: t.file,
+          durationSec: t.durationSec,
+        }));
+      const videos = playlistItems
+        .filter((i) => i.kind === "video")
+        .map((v) => ({
+          title: v.title,
+          file: v.file,
+          poster: (v as any).poster,
+        }));
+      return {
+        slug: "playlist",
+        title: "My Playlist",
+        artist: "Loftwah",
+        year: new Date().getFullYear(),
+        cover: "/playlist.jpg",
+        tracks,
+        videos,
+      } as AlbumData;
+    }
     const found =
       albums.find((a) => a.slug === selectedSlug) ?? albums[0] ?? null;
     if (!found) return null;
     // Default artist fallback
     return { ...found, artist: found.artist || "Loftwah" } as AlbumData;
-  }, [albums, selectedSlug]);
+  }, [albums, selectedSlug, playlistVersion, playlistItems]);
   // Always fetch media via the Worker route that proxies R2
   const base = album ? `/media/${album.slug}` : "";
   // Lookup for per-album cover by slug
@@ -99,13 +128,52 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   }, [albums]);
   const queue = useMemo(() => {
     if (!album) return [] as QueueItem[];
+    // Helper to generate a unique/stable key for items
+    const keyForItem = (it: QueueItem) =>
+      `${it.albumSlug}:${it.kind}:${it.file}`;
+    // Read saved order from localStorage for a given slug
+    const readOrder = (slug: string): string[] => {
+      try {
+        const raw = localStorage.getItem(`lfm.order.${slug}`);
+        if (!raw) return [];
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? (arr as string[]) : [];
+      } catch {
+        return [];
+      }
+    };
+    // Apply saved order to a queue without losing unknown items (append them)
+    const applySavedOrder = (slug: string, items: QueueItem[]): QueueItem[] => {
+      const saved = readOrder(slug);
+      if (!saved.length) return items;
+      const map = new Map<string, QueueItem>();
+      for (const it of items) map.set(keyForItem(it), it);
+      const ordered: QueueItem[] = [];
+      for (const k of saved) {
+        const it = map.get(k);
+        if (it) {
+          ordered.push(it);
+          map.delete(k);
+        }
+      }
+      // Append any items that weren't in the saved list, keeping original relative order
+      for (const it of items) {
+        const k = keyForItem(it);
+        if (map.has(k)) ordered.push(it);
+      }
+      return ordered;
+    };
+
     if (album.slug === "all") {
       const q: QueueItem[] = [];
       for (const a of albums) q.push(...buildQueue(a));
-      return q;
+      return applySavedOrder("all", q);
     }
-    return buildQueue(album);
-  }, [album, albums]);
+    if (album.slug === "playlist") {
+      return playlistItems;
+    }
+    return applySavedOrder(album.slug, buildQueue(album));
+  }, [album, albums, playlistVersion, playlistItems, orderVersion]);
   const [index, setIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [shuffle, setShuffle] = useState(false);
@@ -118,6 +186,12 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
       HTMLVideoElement & { pause: () => void; play: () => Promise<void> }
   >(null as any);
   const liveRef = useRef<HTMLDivElement | null>(null);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  useEffect(() => {
+    if (!statusMsg) return;
+    const t = window.setTimeout(() => setStatusMsg(null), 1200);
+    return () => window.clearTimeout(t);
+  }, [statusMsg]);
 
   useEffect(() => {
     setIndex(0);
@@ -153,6 +227,146 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   }, [selectedSlug]);
 
   const current = queue[index] ?? null;
+  // Playlist helpers
+  const persistPlaylist = (items: QueueItem[]) => {
+    try {
+      localStorage.setItem("lfm.playlist", JSON.stringify({ items }));
+      setPlaylistVersion((v) => v + 1);
+      setPlaylistItems(items);
+      try {
+        window.dispatchEvent(new Event("lfm-playlist-updated"));
+      } catch {}
+    } catch {}
+  };
+  const addToPlaylist = (item: QueueItem) => {
+    try {
+      const raw = localStorage.getItem("lfm.playlist");
+      const items = raw ? (JSON.parse(raw).items as QueueItem[]) || [] : [];
+      // Avoid duplicate exact same file within same album positionally adjacent? Allow duplicates but this avoids immediate dup
+      const last = items[items.length - 1];
+      const next =
+        last && last.file === item.file && last.albumSlug === item.albumSlug
+          ? items
+          : [...items, item];
+      persistPlaylist(next);
+    } catch {}
+  };
+  const removeFromPlaylist = (i: number) => {
+    try {
+      const raw = localStorage.getItem("lfm.playlist");
+      const items = raw ? (JSON.parse(raw).items as QueueItem[]) || [] : [];
+      const next = items.slice(0, i).concat(items.slice(i + 1));
+      persistPlaylist(next);
+    } catch {}
+  };
+  const moveUp = (i: number) => {
+    if (i <= 0) return;
+    try {
+      const raw = localStorage.getItem("lfm.playlist");
+      const items = raw ? (JSON.parse(raw).items as QueueItem[]) || [] : [];
+      const copy = items.slice();
+      const tmp = copy[i - 1];
+      copy[i - 1] = copy[i];
+      copy[i] = tmp;
+      persistPlaylist(copy);
+    } catch {}
+  };
+  const moveDown = (i: number) => {
+    try {
+      const raw = localStorage.getItem("lfm.playlist");
+      const items = raw ? (JSON.parse(raw).items as QueueItem[]) || [] : [];
+      if (i >= items.length - 1) return;
+      const copy = items.slice();
+      const tmp = copy[i + 1];
+      copy[i + 1] = copy[i];
+      copy[i] = tmp;
+      persistPlaylist(copy);
+    } catch {}
+  };
+
+  // Generic queue reordering for Album and All Songs views (persisted per view)
+  const reorderWithinCurrentView = (fromIndex: number, toIndex: number) => {
+    if (!album) return;
+    if (fromIndex === toIndex) return;
+    // Playlist uses its own persistence; skip here
+    if (album.slug === "playlist") return;
+    const slug = album.slug; // album slug or "all"
+    const keyForItem = (it: QueueItem) =>
+      `${it.albumSlug}:${it.kind}:${it.file}`;
+    const currentKey = queue[index]
+      ? keyForItem(queue[index] as QueueItem)
+      : null;
+    const keys = queue.map((it) => keyForItem(it as QueueItem));
+    if (
+      fromIndex < 0 ||
+      toIndex < 0 ||
+      fromIndex >= keys.length ||
+      toIndex >= keys.length
+    )
+      return;
+    const copy = keys.slice();
+    const [moved] = copy.splice(fromIndex, 1);
+    copy.splice(toIndex, 0, moved);
+    try {
+      localStorage.setItem(`lfm.order.${slug}`, JSON.stringify(copy));
+      setOrderVersion((v) => v + 1);
+      if (currentKey) {
+        const ni = copy.indexOf(currentKey);
+        if (ni >= 0) setIndex(ni);
+      }
+      try {
+        window.dispatchEvent(new Event("lfm-order-updated"));
+        const movedTo = toIndex;
+        const announceMsg = `Moved to position ${movedTo + 1}`;
+        if (liveRef.current) {
+          liveRef.current.textContent = announceMsg;
+        }
+      } catch {}
+    } catch {}
+  };
+
+  const moveUpGeneric = (i: number) => {
+    if (i <= 0) return;
+    const movedItem = queue[i] as any;
+    if (selectedSlug === "playlist") {
+      moveUp(i);
+      try {
+        window.dispatchEvent(
+          new CustomEvent("lfm-row-moved", { detail: i - 1 }),
+        );
+      } catch {}
+      setStatusMsg(`Moved "${movedItem?.title || "Item"}" to #${i}`);
+      if (liveRef.current)
+        liveRef.current.textContent = `Moved to position ${i}`;
+      return;
+    }
+    reorderWithinCurrentView(i, i - 1);
+    try {
+      window.dispatchEvent(new CustomEvent("lfm-row-moved", { detail: i - 1 }));
+    } catch {}
+    setStatusMsg(`Moved "${movedItem?.title || "Item"}" to #${i}`);
+  };
+  const moveDownGeneric = (i: number) => {
+    if (i >= queue.length - 1) return;
+    const movedItem = queue[i] as any;
+    if (selectedSlug === "playlist") {
+      moveDown(i);
+      try {
+        window.dispatchEvent(
+          new CustomEvent("lfm-row-moved", { detail: i + 1 }),
+        );
+      } catch {}
+      setStatusMsg(`Moved "${movedItem?.title || "Item"}" to #${i + 2}`);
+      if (liveRef.current)
+        liveRef.current.textContent = `Moved to position ${i + 2}`;
+      return;
+    }
+    reorderWithinCurrentView(i, i + 1);
+    try {
+      window.dispatchEvent(new CustomEvent("lfm-row-moved", { detail: i + 1 }));
+    } catch {}
+    setStatusMsg(`Moved "${movedItem?.title || "Item"}" to #${i + 2}`);
+  };
 
   const doPlay = async () => {
     try {
@@ -242,6 +456,48 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     ? mediaUrl(`/media/${current.albumSlug || album?.slug || ""}`, current.file)
     : undefined;
   const [coverFallback, setCoverFallback] = useState<string | null>(null);
+  // Lyrics support: only attempt when playing an audio item from a real album (exclude virtual views like "all" and "playlist")
+  const [lyrics, setLyrics] = useState<string | null>(null);
+  useEffect(() => {
+    setLyrics(null);
+    const slug = current?.albumSlug || album?.slug;
+    const isAudio = current?.kind === "audio";
+    if (!slug || slug === "all" || slug === "playlist" || !isAudio) return;
+    fetch(`/media/${slug}/${encodeURIComponent("lyrics.txt")}`)
+      .then((r) => (r.ok ? r.text() : Promise.reject()))
+      .then((text) => setLyrics(text))
+      .catch(() => setLyrics(null));
+  }, [current?.albumSlug, album?.slug, current?.kind]);
+  // Refresh playlist-based views when the playlist changes elsewhere
+  useEffect(() => {
+    const read = () => {
+      try {
+        const raw = localStorage.getItem("lfm.playlist");
+        const items = raw ? (JSON.parse(raw).items as QueueItem[]) : [];
+        setPlaylistItems(items);
+      } catch {}
+    };
+    read();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "lfm.playlist") {
+        setPlaylistVersion((v) => v + 1);
+        read();
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    const onPlaylistUpdated = () => {
+      setPlaylistVersion((v) => v + 1);
+      read();
+    };
+    window.addEventListener("lfm-playlist-updated", onPlaylistUpdated as any);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(
+        "lfm-playlist-updated",
+        onPlaylistUpdated as any,
+      );
+    };
+  }, []);
 
   // Keyboard shortcuts: Space=play/pause, arrows seek, P/N previous/next, up/down volume
   useEffect(() => {
@@ -370,6 +626,11 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
         {/* Removed pill album selector; album selection happens via clickable covers */}
 
         {/* Queue list (one column) */}
+        {statusMsg ? (
+          <div className="mb-2 text-xs text-white/80" aria-live="polite">
+            {statusMsg}
+          </div>
+        ) : null}
         <QueueList
           items={queue as any}
           activeIndex={index}
@@ -378,7 +639,22 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
             setIndex(i);
             if (!isPlaying) doPlay();
           }}
+          onAddToPlaylist={
+            selectedSlug !== "playlist" ? addToPlaylist : undefined
+          }
+          onRemoveFromPlaylist={
+            selectedSlug === "playlist" ? removeFromPlaylist : undefined
+          }
+          onMoveUp={moveUpGeneric}
+          onMoveDown={moveDownGeneric}
         />
+
+        {/* Lyrics */}
+        {lyrics ? (
+          <div className="mt-4 p-3 panel whitespace-pre-wrap text-sm leading-relaxed">
+            {lyrics}
+          </div>
+        ) : null}
       </div>
 
       {/* Bottom transport bar */}

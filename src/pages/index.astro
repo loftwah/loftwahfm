@@ -9,6 +9,9 @@ import { getCollection } from 'astro:content';
 
 const albums = await getCollection('albums');
 const albumEntries = albums.map((a) => ({ id: a.id, ...a.data }));
+// Precompute counts for the All Songs virtual album
+const totalTracks = albumEntries.reduce((sum, a) => sum + (a.tracks?.length || 0), 0);
+const totalVideos = albumEntries.reduce((sum, a) => sum + (a.videos?.length || 0), 0);
 
 // Force SSR so OG tags are built from the actual request origin (Workers/preview)
 export const prerender = false;
@@ -36,7 +39,8 @@ export const prerender = false;
             {albumEntries.length > 1 ? (
                 <section class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                     {([
-                      { id: 'all', slug: 'all', title: 'All Songs', artist: 'Loftwah', year: new Date().getFullYear(), cover: '/all-songs.jpg', tracks: [] },
+                      { id: 'all', slug: 'all', title: 'All Songs', artist: 'Loftwah', year: new Date().getFullYear(), cover: '/all-songs.jpg', tracks: Array.from({ length: totalTracks }), videos: Array.from({ length: totalVideos }) },
+                      { id: 'playlist', slug: 'playlist', title: 'My Playlist', artist: 'Loftwah', year: new Date().getFullYear(), cover: '/playlist.jpg', tracks: [] },
                       ...albumEntries,
                     ]).map((a) => (
                         // @ts-ignore Astro client directive

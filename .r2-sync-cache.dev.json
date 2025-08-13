@@ -1,0 +1,168 @@
+{
+  "objects": {
+    "loftwahfm-dev/phantom-love/Phantom Love Remix 1.mp3": {
+      "size": 5861975,
+      "mtimeMs": 1754900874134.376
+    },
+    "loftwahfm-dev/phantom-love/Phantom Love Remix 10.mp3": {
+      "size": 5351920,
+      "mtimeMs": 1754900721842.054
+    },
+    "loftwahfm-dev/phantom-love/Phantom Love Remix 11.mp3": {
+      "size": 5151148,
+      "mtimeMs": 1754900715515.2727
+    },
+    "loftwahfm-dev/phantom-love/Phantom Love Remix 12.mp3": {
+      "size": 4832567,
+      "mtimeMs": 1754900709675.729
+    },
+    "loftwahfm-dev/phantom-love/Phantom Love Remix 2.mp3": {
+      "size": 5654224,
+      "mtimeMs": 1754900842965.5613
+    },
+    "loftwahfm-dev/phantom-love/Phantom Love Remix 3.mp3": {
+      "size": 6961330,
+      "mtimeMs": 1754900828117.678
+    },
+    "loftwahfm-dev/phantom-love/Phantom Love Remix 4.mp3": {
+      "size": 6196644,
+      "mtimeMs": 1754900804111.5933
+    },
+    "loftwahfm-dev/phantom-love/Phantom Love Remix 5.mp3": {
+      "size": 5691124,
+      "mtimeMs": 1754900794356.761
+    },
+    "loftwahfm-dev/phantom-love/Phantom Love Remix 6.mp3": {
+      "size": 6658805,
+      "mtimeMs": 1754900786400.6133
+    },
+    "loftwahfm-dev/phantom-love/Phantom Love Remix 7.mp3": {
+      "size": 6166380,
+      "mtimeMs": 1754900776187.7698
+    },
+    "loftwahfm-dev/phantom-love/Phantom Love Remix 8.mp3": {
+      "size": 5978363,
+      "mtimeMs": 1754900747385.8938
+    },
+    "loftwahfm-dev/phantom-love/Phantom Love Remix 9.mp3": {
+      "size": 5311445,
+      "mtimeMs": 1754900729449.2085
+    },
+    "loftwahfm-dev/phantom-love/Phantom Love.mp3": {
+      "size": 5005049,
+      "mtimeMs": 1754901349925.67
+    },
+    "loftwahfm-dev/phantom-love/album-cover-prompt.txt": {
+      "size": 496,
+      "mtimeMs": 1754904296523.6685
+    },
+    "loftwahfm-dev/phantom-love/android-chrome-192x192.png": {
+      "size": 28549,
+      "mtimeMs": 1754924437972.4648
+    },
+    "loftwahfm-dev/phantom-love/android-chrome-512x512.png": {
+      "size": 272286,
+      "mtimeMs": 1754924437976.4648
+    },
+    "loftwahfm-dev/phantom-love/apple-touch-icon.png": {
+      "size": 25917,
+      "mtimeMs": 1754924437976.4648
+    },
+    "loftwahfm-dev/phantom-love/cover.jpg": {
+      "size": 15868,
+      "mtimeMs": 1754904584699.808
+    },
+    "loftwahfm-dev/phantom-love/cover.png": {
+      "size": 1258551,
+      "mtimeMs": 1754924437984.4648
+    },
+    "loftwahfm-dev/phantom-love/favicon-16x16.png": {
+      "size": 515,
+      "mtimeMs": 1754868568000
+    },
+    "loftwahfm-dev/phantom-love/favicon-32x32.png": {
+      "size": 1439,
+      "mtimeMs": 1754868568000
+    },
+    "loftwahfm-dev/phantom-love/favicon.ico": {
+      "size": 15406,
+      "mtimeMs": 1754868568000
+    },
+    "loftwahfm-dev/phantom-love/lyrics.txt": {
+      "size": 1667,
+      "mtimeMs": 1754901550801.5317
+    },
+    "loftwahfm-dev/phantom-love/phantom-og.jpg": {
+      "size": 17922,
+      "mtimeMs": 1754905802648.5808
+    },
+    "loftwahfm-dev/phantom-love/site.webmanifest": {
+      "size": 360,
+      "mtimeMs": 1754916153428.5723
+    },
+    "loftwahfm-dev/rain-from-a-puddle/Rain From a Puddle (Campfire Remix).mp3": {
+      "size": 3888069,
+      "mtimeMs": 1755061553863.3777
+    },
+    "loftwahfm-dev/rain-from-a-puddle/Rain From a Puddle (House Remix).mp3": {
+      "size": 7694167,
+      "mtimeMs": 1755061158030.8506
+    },
+    "loftwahfm-dev/rain-from-a-puddle/Rain From a Puddle (Retro Video Game Remix).mp3": {
+      "size": 5132643,
+      "mtimeMs": 1755061119829.0005
+    },
+    "loftwahfm-dev/rain-from-a-puddle/Rain From a Puddle (Sunday Drinks Remix).mp3": {
+      "size": 4452328,
+      "mtimeMs": 1755061238636.686
+    },
+    "loftwahfm-dev/rain-from-a-puddle/Rain From a Puddle.mp3": {
+      "size": 4439136,
+      "mtimeMs": 1755058695081.4507
+    },
+    "loftwahfm-dev/rain-from-a-puddle/cover.jpg": {
+      "size": 33601,
+      "mtimeMs": 1755061769932.663
+    },
+    "loftwahfm-dev/rain-from-a-puddle/lyrics.txt": {
+      "size": 1499,
+      "mtimeMs": 1755058937615.2483
+    },
+    "loftwahfm-dev/scripts/sync-r2.mjs": {
+      "size": 2274,
+      "mtimeMs": 1755065926721.4282
+    },
+    "loftwahfm-dev/shadow-moves/Shadow Moves (Lo-fi Remix).mp3": {
+      "size": 5290784,
+      "mtimeMs": 1755011893759.4722
+    },
+    "loftwahfm-dev/shadow-moves/Shadow Moves (Metal Remix).mp3": {
+      "size": 5600022,
+      "mtimeMs": 1755011893787.4727
+    },
+    "loftwahfm-dev/shadow-moves/Shadow Moves (Nu Metal Remix).mp3": {
+      "size": 6281133,
+      "mtimeMs": 1755011893819.4734
+    },
+    "loftwahfm-dev/shadow-moves/Shadow Moves (Pop Remix).mp3": {
+      "size": 4321372,
+      "mtimeMs": 1755011893843.4736
+    },
+    "loftwahfm-dev/shadow-moves/Shadow Moves (Smooth Remix).mp3": {
+      "size": 5877776,
+      "mtimeMs": 1755011893871.474
+    },
+    "loftwahfm-dev/shadow-moves/Shadow Moves.mp3": {
+      "size": 4359507,
+      "mtimeMs": 1755011893895.4746
+    },
+    "loftwahfm-dev/shadow-moves/cover.jpg": {
+      "size": 22017,
+      "mtimeMs": 1755011893895.4746
+    },
+    "loftwahfm-dev/shadow-moves/lyrics.txt": {
+      "size": 2861,
+      "mtimeMs": 1755011893895.4746
+    }
+  }
+}

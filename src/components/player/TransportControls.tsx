@@ -56,6 +56,9 @@ export function TransportControls(props: TransportControlsProps) {
         >
           <Shuffle size={20} strokeWidth={2.75} />
         </button>
+        <span className="text-xs opacity-80 hidden sm:inline" aria-hidden>
+          {shuffle ? "Shuffle on" : "Shuffle off"}
+        </span>
       </div>
 
       {/* Center: prev / play / next */}
@@ -124,6 +127,13 @@ export function TransportControls(props: TransportControlsProps) {
             <Repeat size={20} strokeWidth={2.75} />
           )}
         </button>
+        <span className="text-xs opacity-80 hidden sm:inline" aria-hidden>
+          {repeat === "one"
+            ? "Repeat one"
+            : repeat === "all"
+              ? "Repeat all"
+              : "Repeat off"}
+        </span>
         {rightSlot}
       </div>
     </div>
