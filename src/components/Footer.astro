@@ -4,12 +4,12 @@ import { Album, Github, Twitter, Link2 } from '@lucide/astro';
 ---
 
 <footer class="border-t border-white bg-black text-white">
-  <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-8 text-sm">
-    <span class="inline-flex items-center gap-2">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-8 text-sm flex-col gap-4 text-center sm:text-left sm:flex-row sm:gap-0 safe-area-bottom">
+    <span class="inline-flex items-center gap-2 justify-center">
       <img src="/fm-og.jpg" alt="Loftwah" width="16" height="16" class="size-4 rounded-full border border-white object-cover" loading="lazy" />
       &copy; {today.getFullYear()} Loftwah. All rights reserved.
     </span>
-    <div class="flex items-center gap-4">
+    <div class="flex flex-wrap items-center justify-center gap-3 sm:justify-end">
       <a class="inline-flex items-center gap-1 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black" href="https://x.com/loftwah" target="_blank" rel="noopener noreferrer">
         <Twitter size={14} />
         X
