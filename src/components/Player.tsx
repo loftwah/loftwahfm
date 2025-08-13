@@ -186,6 +186,12 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
       HTMLVideoElement & { pause: () => void; play: () => Promise<void> }
   >(null as any);
   const liveRef = useRef<HTMLDivElement | null>(null);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  useEffect(() => {
+    if (!statusMsg) return;
+    const t = window.setTimeout(() => setStatusMsg(null), 1200);
+    return () => window.clearTimeout(t);
+  }, [statusMsg]);
 
   useEffect(() => {
     setIndex(0);
@@ -320,20 +326,40 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   };
 
   const moveUpGeneric = (i: number) => {
-    if (selectedSlug === "playlist") return moveUp(i);
     if (i <= 0) return;
+    const movedItem = queue[i] as any;
+    if (selectedSlug === "playlist") {
+      moveUp(i);
+      try {
+        window.dispatchEvent(new CustomEvent("lfm-row-moved", { detail: i - 1 }));
+      } catch {}
+      setStatusMsg(`Moved "${movedItem?.title || "Item"}" to #${i}`);
+      if (liveRef.current) liveRef.current.textContent = `Moved to position ${i}`;
+      return;
+    }
     reorderWithinCurrentView(i, i - 1);
     try {
       window.dispatchEvent(new CustomEvent("lfm-row-moved", { detail: i - 1 }));
     } catch {}
+    setStatusMsg(`Moved "${movedItem?.title || "Item"}" to #${i}`);
   };
   const moveDownGeneric = (i: number) => {
-    if (selectedSlug === "playlist") return moveDown(i);
     if (i >= queue.length - 1) return;
+    const movedItem = queue[i] as any;
+    if (selectedSlug === "playlist") {
+      moveDown(i);
+      try {
+        window.dispatchEvent(new CustomEvent("lfm-row-moved", { detail: i + 1 }));
+      } catch {}
+      setStatusMsg(`Moved "${movedItem?.title || "Item"}" to #${i + 2}`);
+      if (liveRef.current) liveRef.current.textContent = `Moved to position ${i + 2}`;
+      return;
+    }
     reorderWithinCurrentView(i, i + 1);
     try {
       window.dispatchEvent(new CustomEvent("lfm-row-moved", { detail: i + 1 }));
     } catch {}
+    setStatusMsg(`Moved "${movedItem?.title || "Item"}" to #${i + 2}`);
   };
 
   const doPlay = async () => {
@@ -594,6 +620,9 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
         {/* Removed pill album selector; album selection happens via clickable covers */}
 
         {/* Queue list (one column) */}
+        {statusMsg ? (
+          <div className="mb-2 text-xs text-white/80" aria-live="polite">{statusMsg}</div>
+        ) : null}
         <QueueList
           items={queue as any}
           activeIndex={index}
