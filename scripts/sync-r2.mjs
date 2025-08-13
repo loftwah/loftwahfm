@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execSync } from "node:child_process";
 import { readdirSync, statSync, readFileSync, writeFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { join, extname } from "node:path";
 
 const root = process.cwd();
 const mediaRoot = join(root, "music");
@@ -33,12 +33,28 @@ const albumsOnDisk = readdirSync(mediaRoot, { withFileTypes: true })
 const bucket = env === "prod" ? "loftwahfm" : "loftwahfm-dev";
 if (!cache.objects) cache.objects = {};
 
+const allowedExtensions = new Set([
+  ".mp3",
+  ".wav",
+  ".flac",
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".webp",
+  ".txt",
+  ".json",
+  ".webmanifest",
+  ".ico",
+]);
+
 function listFilesRecursive(dir) {
   const out = [];
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
     const st = statSync(full);
     if (st.isDirectory()) continue; // flat upload; keys include only basename
+    const ext = extname(full).toLowerCase();
+    if (!allowedExtensions.has(ext)) continue;
     out.push(full);
   }
   return out;
@@ -46,8 +62,22 @@ function listFilesRecursive(dir) {
 
 const nodeBin = process.execPath;
 const wranglerBin = join(root, "node_modules", "wrangler", "bin", "wrangler.js");
-function sh(cmd) {
-  execSync(cmd, { stdio: "inherit" });
+function sleep(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+function shWithRetry(cmd, attempts = 3) {
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      execSync(cmd, { stdio: "inherit" });
+      return;
+    } catch (e) {
+      if (i === attempts) throw e;
+      const delay = 500 * i;
+      console.warn(`Command failed. Retrying in ${delay}ms (${i}/${attempts})...`);
+      sleep(delay);
+    }
+  }
 }
 
 // Note: wrangler 4.21.x does not support `r2 object head` or listing.
@@ -83,7 +113,7 @@ for (const slug of albumsOnDisk) {
       // Upload
       const remoteFlag = useRemote ? " --remote" : "";
       const putCmd = `${JSON.stringify(nodeBin)} ${JSON.stringify(wranglerBin)} r2 object put${remoteFlag} "${bucket}/${key}" --file "${file}"`;
-      sh(putCmd);
+      shWithRetry(putCmd);
       cache.objects[key] = { size: st.size, mtimeMs: st.mtimeMs };
     }
   } catch (e) {
