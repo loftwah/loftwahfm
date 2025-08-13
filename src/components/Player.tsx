@@ -71,6 +71,8 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     }
   })();
   const [selectedSlug, setSelectedSlug] = useState<string>(initialSlug);
+  const [playlistVersion, setPlaylistVersion] = useState(0);
+  const [playlistItems, setPlaylistItems] = useState<QueueItem[]>([]);
   const album = useMemo(() => {
     if (selectedSlug === "all") {
       return {
@@ -133,8 +135,6 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
-  const [playlistVersion, setPlaylistVersion] = useState(0);
-  const [playlistItems, setPlaylistItems] = useState<QueueItem[]>([]);
   const mediaRef = useRef<
     HTMLAudioElement &
       HTMLVideoElement & { pause: () => void; play: () => Promise<void> }
