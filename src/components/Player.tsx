@@ -677,7 +677,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
 
         {/* Lyrics */}
         {lyrics ? (
-          <div className="mt-6 p-4 md:p-5 panel whitespace-pre-wrap break-words text-sm leading-relaxed">
+          <div className="mt-6 mb-28 p-4 md:p-5 panel whitespace-pre-wrap break-words text-sm leading-relaxed">
             {lyrics}
           </div>
         ) : null}
