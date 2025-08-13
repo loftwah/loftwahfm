@@ -90,7 +90,7 @@ export function AlbumCard({
   }, [album.slug]);
   return (
     <button
-      className="panel w-full text-left overflow-hidden !p-0 hover:bg-white/10"
+      className="panel w-full text-left overflow-hidden !p-0 hover:bg-white/10 block"
       onClick={() => {
         // Allow parent islands to hook directly
         onSelect?.(album.slug);
@@ -122,7 +122,7 @@ export function AlbumCard({
             )
           }
           alt={`${album.title} cover`}
-          className="h-full w-full object-cover"
+          className="block h-full w-full object-cover object-top"
           loading="lazy"
         />
       </div>
