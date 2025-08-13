@@ -61,6 +61,8 @@ body {
 .player-bar {
   @apply border-t border-white;
   padding-bottom: env(safe-area-inset-bottom);
+  position: sticky;
+  z-index: 50;
 }
 .btn-square {
   /* Fixed square controls */
@@ -72,7 +74,7 @@ body {
 
 /* Music-player specific controls */
 .control-btn {
-  @apply grid place-items-center rounded-full border-2 border-white bg-black text-white transition-transform transition-colors outline-none;
+  @apply grid place-items-center rounded-full border-2 border-white bg-black text-white transition outline-none;
   width: 3rem; /* larger tap target on mobile */
   height: 3rem;
   touch-action: manipulation;

@@ -83,12 +83,40 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
         videos: [],
       } as AlbumData;
     }
+    if (selectedSlug === "playlist") {
+      // Virtual album backed by localStorage
+      const stored = (() => {
+        try {
+          const raw = localStorage.getItem("lfm.playlist");
+          if (!raw) return null;
+          return JSON.parse(raw) as { items: QueueItem[] };
+        } catch {
+          return null;
+        }
+      })();
+      const items = stored?.items || [];
+      const tracks = items
+        .filter((i) => i.kind === "audio")
+        .map((t) => ({ title: t.title, file: t.file, durationSec: t.durationSec }));
+      const videos = items
+        .filter((i) => i.kind === "video")
+        .map((v) => ({ title: v.title, file: v.file, poster: (v as any).poster }));
+      return {
+        slug: "playlist",
+        title: "My Playlist",
+        artist: "Loftwah",
+        year: new Date().getFullYear(),
+        cover: "/playlist.jpg",
+        tracks,
+        videos,
+      } as AlbumData;
+    }
     const found =
       albums.find((a) => a.slug === selectedSlug) ?? albums[0] ?? null;
     if (!found) return null;
     // Default artist fallback
     return { ...found, artist: found.artist || "Loftwah" } as AlbumData;
-  }, [albums, selectedSlug]);
+  }, [albums, selectedSlug, playlistVersion]);
   // Always fetch media via the Worker route that proxies R2
   const base = album ? `/media/${album.slug}` : "";
   // Lookup for per-album cover by slug
@@ -104,8 +132,17 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
       for (const a of albums) q.push(...buildQueue(a));
       return q;
     }
+    if (album.slug === "playlist") {
+      try {
+        const raw = localStorage.getItem("lfm.playlist");
+        const items = raw ? (JSON.parse(raw).items as QueueItem[]) : [];
+        return items;
+      } catch {
+        return [] as QueueItem[];
+      }
+    }
     return buildQueue(album);
-  }, [album, albums]);
+  }, [album, albums, playlistVersion]);
   const [index, setIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [shuffle, setShuffle] = useState(false);
@@ -113,6 +150,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
+  const [playlistVersion, setPlaylistVersion] = useState(0);
   const mediaRef = useRef<
     HTMLAudioElement &
       HTMLVideoElement & { pause: () => void; play: () => Promise<void> }
@@ -153,6 +191,58 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   }, [selectedSlug]);
 
   const current = queue[index] ?? null;
+  // Playlist helpers
+  const persistPlaylist = (items: QueueItem[]) => {
+    try {
+      localStorage.setItem("lfm.playlist", JSON.stringify({ items }));
+      setPlaylistVersion((v) => v + 1);
+      try {
+        window.dispatchEvent(new Event("lfm-playlist-updated"));
+      } catch {}
+    } catch {}
+  };
+  const addToPlaylist = (item: QueueItem) => {
+    try {
+      const raw = localStorage.getItem("lfm.playlist");
+      const items = raw ? ((JSON.parse(raw).items as QueueItem[]) || []) : [];
+      // Avoid duplicate exact same file within same album positionally adjacent? Allow duplicates but this avoids immediate dup
+      const last = items[items.length - 1];
+      const next = last && last.file === item.file && last.albumSlug === item.albumSlug ? items : [...items, item];
+      persistPlaylist(next);
+    } catch {}
+  };
+  const removeFromPlaylist = (i: number) => {
+    try {
+      const raw = localStorage.getItem("lfm.playlist");
+      const items = raw ? ((JSON.parse(raw).items as QueueItem[]) || []) : [];
+      const next = items.slice(0, i).concat(items.slice(i + 1));
+      persistPlaylist(next);
+    } catch {}
+  };
+  const moveUp = (i: number) => {
+    if (i <= 0) return;
+    try {
+      const raw = localStorage.getItem("lfm.playlist");
+      const items = raw ? ((JSON.parse(raw).items as QueueItem[]) || []) : [];
+      const copy = items.slice();
+      const tmp = copy[i - 1];
+      copy[i - 1] = copy[i];
+      copy[i] = tmp;
+      persistPlaylist(copy);
+    } catch {}
+  };
+  const moveDown = (i: number) => {
+    try {
+      const raw = localStorage.getItem("lfm.playlist");
+      const items = raw ? ((JSON.parse(raw).items as QueueItem[]) || []) : [];
+      if (i >= items.length - 1) return;
+      const copy = items.slice();
+      const tmp = copy[i + 1];
+      copy[i + 1] = copy[i];
+      copy[i] = tmp;
+      persistPlaylist(copy);
+    } catch {}
+  };
 
   const doPlay = async () => {
     try {
@@ -242,6 +332,30 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     ? mediaUrl(`/media/${current.albumSlug || album?.slug || ""}`, current.file)
     : undefined;
   const [coverFallback, setCoverFallback] = useState<string | null>(null);
+  // Lyrics support: try fetching lyrics.txt from the current item's album directory
+  const [lyrics, setLyrics] = useState<string | null>(null);
+  useEffect(() => {
+    setLyrics(null);
+    const slug = current?.albumSlug || album?.slug;
+    if (!slug) return;
+    fetch(`/media/${slug}/${encodeURIComponent("lyrics.txt")}`)
+      .then((r) => (r.ok ? r.text() : Promise.reject()))
+      .then((text) => setLyrics(text))
+      .catch(() => setLyrics(null));
+  }, [current?.albumSlug, album?.slug]);
+  // Refresh playlist-based views when the playlist changes elsewhere
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "lfm.playlist") setPlaylistVersion((v) => v + 1);
+    };
+    window.addEventListener("storage", onStorage);
+    const onPlaylistUpdated = () => setPlaylistVersion((v) => v + 1);
+    window.addEventListener("lfm-playlist-updated", onPlaylistUpdated as any);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("lfm-playlist-updated", onPlaylistUpdated as any);
+    };
+  }, []);
 
   // Keyboard shortcuts: Space=play/pause, arrows seek, P/N previous/next, up/down volume
   useEffect(() => {
@@ -378,7 +492,18 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
             setIndex(i);
             if (!isPlaying) doPlay();
           }}
+          onAddToPlaylist={selectedSlug !== "playlist" ? addToPlaylist : undefined}
+          onRemoveFromPlaylist={selectedSlug === "playlist" ? removeFromPlaylist : undefined}
+          onMoveUp={selectedSlug === "playlist" ? moveUp : undefined}
+          onMoveDown={selectedSlug === "playlist" ? moveDown : undefined}
         />
+
+        {/* Lyrics */}
+        {lyrics ? (
+          <div className="mt-4 p-3 panel whitespace-pre-wrap text-sm leading-relaxed">
+            {lyrics}
+          </div>
+        ) : null}
       </div>
 
       {/* Bottom transport bar */}

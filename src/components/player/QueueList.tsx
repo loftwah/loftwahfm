@@ -1,5 +1,14 @@
 import React from "react";
-import { Music2, Play, Video as VideoIcon, Download } from "lucide-react";
+import {
+  Music2,
+  Play,
+  Video as VideoIcon,
+  Download,
+  Plus,
+  X,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
 
 export type QueueListItem = {
   kind: "audio" | "video";
@@ -14,6 +23,10 @@ interface QueueListProps {
   activeIndex: number;
   isPlaying: boolean;
   onSelect: (index: number) => void;
+  onAddToPlaylist?: (item: QueueListItem) => void;
+  onRemoveFromPlaylist?: (index: number) => void;
+  onMoveUp?: (index: number) => void;
+  onMoveDown?: (index: number) => void;
 }
 
 export function QueueList({
@@ -21,6 +34,10 @@ export function QueueList({
   activeIndex,
   isPlaying,
   onSelect,
+  onAddToPlaylist,
+  onRemoveFromPlaylist,
+  onMoveUp,
+  onMoveDown,
 }: QueueListProps) {
   return (
     <ol
@@ -103,6 +120,58 @@ export function QueueList({
                 >
                   <Download size={16} />
                 </a>
+              ) : null}
+              {onAddToPlaylist ? (
+                <button
+                  className="ml-2 inline-flex items-center text-current/80 hover:text-current shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddToPlaylist(q);
+                  }}
+                  aria-label={`Add ${q.title} to My Playlist`}
+                  title="Add to My Playlist"
+                >
+                  <Plus size={16} />
+                </button>
+              ) : null}
+              {onMoveUp ? (
+                <button
+                  className="ml-2 inline-flex items-center text-current/80 hover:text-current shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMoveUp(i);
+                  }}
+                  aria-label={`Move ${q.title} up`}
+                  title="Move up"
+                >
+                  <ArrowUp size={16} />
+                </button>
+              ) : null}
+              {onMoveDown ? (
+                <button
+                  className="ml-1 inline-flex items-center text-current/80 hover:text-current shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMoveDown(i);
+                  }}
+                  aria-label={`Move ${q.title} down`}
+                  title="Move down"
+                >
+                  <ArrowDown size={16} />
+                </button>
+              ) : null}
+              {onRemoveFromPlaylist ? (
+                <button
+                  className="ml-2 inline-flex items-center text-current/80 hover:text-current shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemoveFromPlaylist(i);
+                  }}
+                  aria-label={`Remove ${q.title} from My Playlist`}
+                  title="Remove from My Playlist"
+                >
+                  <X size={16} />
+                </button>
               ) : null}
             </div>
           </li>
