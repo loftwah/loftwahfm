@@ -331,10 +331,13 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     if (selectedSlug === "playlist") {
       moveUp(i);
       try {
-        window.dispatchEvent(new CustomEvent("lfm-row-moved", { detail: i - 1 }));
+        window.dispatchEvent(
+          new CustomEvent("lfm-row-moved", { detail: i - 1 }),
+        );
       } catch {}
       setStatusMsg(`Moved "${movedItem?.title || "Item"}" to #${i}`);
-      if (liveRef.current) liveRef.current.textContent = `Moved to position ${i}`;
+      if (liveRef.current)
+        liveRef.current.textContent = `Moved to position ${i}`;
       return;
     }
     reorderWithinCurrentView(i, i - 1);
@@ -349,10 +352,13 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     if (selectedSlug === "playlist") {
       moveDown(i);
       try {
-        window.dispatchEvent(new CustomEvent("lfm-row-moved", { detail: i + 1 }));
+        window.dispatchEvent(
+          new CustomEvent("lfm-row-moved", { detail: i + 1 }),
+        );
       } catch {}
       setStatusMsg(`Moved "${movedItem?.title || "Item"}" to #${i + 2}`);
-      if (liveRef.current) liveRef.current.textContent = `Moved to position ${i + 2}`;
+      if (liveRef.current)
+        liveRef.current.textContent = `Moved to position ${i + 2}`;
       return;
     }
     reorderWithinCurrentView(i, i + 1);
@@ -621,7 +627,9 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
 
         {/* Queue list (one column) */}
         {statusMsg ? (
-          <div className="mb-2 text-xs text-white/80" aria-live="polite">{statusMsg}</div>
+          <div className="mb-2 text-xs text-white/80" aria-live="polite">
+            {statusMsg}
+          </div>
         ) : null}
         <QueueList
           items={queue as any}
