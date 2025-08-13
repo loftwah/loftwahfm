@@ -66,6 +66,12 @@ export function QueueList({
         const downloadHref = q.albumSlug
           ? `/media/${q.albumSlug}/${encodeURIComponent(q.file)}`
           : undefined;
+        const shareUrl = `?${(() => {
+          const params = new URLSearchParams();
+          if (q.albumSlug) params.set("album", q.albumSlug);
+          params.set("file", q.file);
+          return params.toString();
+        })()}`;
         const isFirst = i === 0;
         const isLast = i === items.length - 1;
         const isHighlighted =
@@ -133,6 +139,15 @@ export function QueueList({
                   <span className="text-xs opacity-50"> </span>
                 )}
               </button>
+              <a
+                href={shareUrl}
+                onClick={(e) => e.stopPropagation()}
+                className="ml-2 inline-flex items-center text-current/80 hover:text-current shrink-0 text-xs underline"
+                aria-label={`Share link to ${q.title}`}
+                title="Share link"
+              >
+                Share
+              </a>
               {q.kind === "audio" && downloadHref ? (
                 <a
                   href={downloadHref}

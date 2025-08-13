@@ -1,4 +1,9 @@
 import React, { useEffect, useState } from "react";
+import {
+  Link as LinkIcon,
+  Copy as CopyIcon,
+  Check as CheckIcon,
+} from "lucide-react";
 import { Music2, Video as VideoIcon } from "lucide-react";
 
 export interface TrackItem {
@@ -44,6 +49,19 @@ export function AlbumCard({
     tracks: number;
     videos: number;
   }>({ tracks: 0, videos: 0 });
+  const [copied, setCopied] = useState(false);
+
+  const albumHref = `?${new URLSearchParams({ album: album.slug }).toString()}`;
+
+  const copyLink = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const absolute = typeof window !== "undefined" ? new URL(albumHref, window.location.href).toString() : albumHref;
+      await navigator.clipboard.writeText(absolute);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1400);
+    } catch {}
+  };
 
   useEffect(() => {
     if (album.slug !== "playlist") return;
@@ -131,6 +149,24 @@ export function AlbumCard({
             </span>
           ) : null}
         </p>
+        <div className="mt-2 flex items-center gap-2">
+          <a
+            href={albumHref}
+            onClick={(e) => e.stopPropagation()}
+            className="btn text-xs inline-flex items-center gap-1"
+            title="Open shareable link"
+          >
+            <LinkIcon size={14} /> Link
+          </a>
+          <button
+            className="btn text-xs inline-flex items-center gap-1"
+            onClick={copyLink}
+            title="Copy album link"
+          >
+            {copied ? <CheckIcon size={14} /> : <CopyIcon size={14} />}{" "}
+            {copied ? "Copied" : "Copy"}
+          </button>
+        </div>
       </div>
     </button>
   );

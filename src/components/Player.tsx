@@ -227,6 +227,17 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
   }, [selectedSlug]);
 
   const current = queue[index] ?? null;
+  // Select initial track from ?file= param after queue is built
+  useEffect(() => {
+    try {
+      if (!album) return;
+      const params = new URLSearchParams(window.location.search);
+      const fileParam = params.get("file");
+      if (!fileParam) return;
+      const idx = queue.findIndex((q) => q.file === fileParam);
+      if (idx >= 0) setIndex(idx);
+    } catch {}
+  }, [album?.slug, queue.length]);
   // Playlist helpers
   const persistPlaylist = (items: QueueItem[]) => {
     try {
@@ -566,6 +577,16 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
     );
   }, [repeat]);
 
+  // Keep current track reflected in URL (?file=...) for easy sharing
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (current?.file) url.searchParams.set("file", current.file);
+      else url.searchParams.delete("file");
+      window.history.replaceState({}, "", url.toString());
+    } catch {}
+  }, [current?.file, album?.slug]);
+
   return (
     <div className="">
       {/* Main content: queue left, now playing right */}
@@ -581,7 +602,12 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
         {album && current && (
           <NowPlaying
             album={album}
-            item={{ kind: current.kind, title: current.title }}
+            item={{
+              kind: current.kind,
+              title: current.title,
+              file: current.file,
+              albumSlug: current.albumSlug,
+            }}
             coverUrl={coverFallback || resolvedCoverUrl || null}
           />
         )}
@@ -651,7 +677,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
 
         {/* Lyrics */}
         {lyrics ? (
-          <div className="mt-4 p-3 panel whitespace-pre-wrap text-sm leading-relaxed">
+          <div className="mt-6 p-4 md:p-5 panel whitespace-pre-wrap break-words text-sm leading-relaxed">
             {lyrics}
           </div>
         ) : null}
