@@ -90,7 +90,7 @@ export function AlbumCard({
   }, [album.slug]);
   return (
     <button
-      className="panel w-full text-left overflow-hidden !p-0 hover:bg-white/10 block"
+      className="panel w-full text-left overflow-hidden !p-0 hover:bg-white/10 flex flex-col self-start leading-none"
       onClick={() => {
         // Allow parent islands to hook directly
         onSelect?.(album.slug);
@@ -109,7 +109,7 @@ export function AlbumCard({
         } catch {}
       }}
     >
-      <div className="aspect-square w-full bg-black">
+      <div className="aspect-square w-full bg-black overflow-hidden">
         <img
           src={imgSrc}
           onError={() =>
@@ -126,7 +126,8 @@ export function AlbumCard({
           loading="lazy"
         />
       </div>
-      <div className="p-3">
+      <div className="p-3 flex-1 flex flex-col"
+      >
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold text-white">{album.title}</h3>
           <span className="text-xs text-white/60">{album.year}</span>
@@ -152,27 +153,28 @@ export function AlbumCard({
             </span>
           ) : null}
         </p>
-        {album.slug !== "playlist" ? (
-          <div className="mt-2 flex items-center gap-2">
-            <a
-              href={albumHref}
-              onClick={(e) => e.stopPropagation()}
-              className="btn text-xs inline-flex items-center gap-1"
-              title="Open shareable link"
-            >
-              <LinkIcon size={14} /> Link
-            </a>
-            <button
-              className="btn text-xs inline-flex items-center gap-1"
-              onClick={copyLink}
-              title="Copy album link"
-            >
-              {copied ? <CheckIcon size={14} /> : <CopyIcon size={14} />} {" "}
-              {copied ? "Copied" : "Copy"}
-            </button>
-          </div>
-        ) : null}
-        <div className="mt-2 min-h-[2.25rem]"></div>
+        <div className="mt-2 h-10 flex items-center gap-2">
+          {album.slug !== "playlist" ? (
+            <>
+              <a
+                href={albumHref}
+                onClick={(e) => e.stopPropagation()}
+                className="btn text-xs inline-flex items-center gap-1"
+                title="Open shareable link"
+              >
+                <LinkIcon size={14} /> Link
+              </a>
+              <button
+                className="btn text-xs inline-flex items-center gap-1"
+                onClick={copyLink}
+                title="Copy album link"
+              >
+                {copied ? <CheckIcon size={14} /> : <CopyIcon size={14} />} {" "}
+                {copied ? "Copied" : "Copy"}
+              </button>
+            </>
+          ) : null}
+        </div>
       </div>
     </button>
   );
