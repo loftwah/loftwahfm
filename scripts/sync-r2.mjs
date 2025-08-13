@@ -4,6 +4,7 @@ import { readdirSync, statSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
+const mediaRoot = join(root, "music");
 const env = process.argv[2] === "prod" ? "prod" : "dev";
 const forceUpload = process.argv.includes("--force") || process.argv.includes("-f");
 // Always target remote R2; allow opting out with --local
@@ -18,26 +19,10 @@ try {
 } catch {
   cache = {};
 }
-const albumsOnDisk = readdirSync(root, { withFileTypes: true })
+const albumsOnDisk = readdirSync(mediaRoot, { withFileTypes: true })
   .filter((d) => d.isDirectory())
   .map((d) => d.name)
-  .filter(
-    (name) =>
-      !name.startsWith(".") &&
-      ![
-        "node_modules",
-        "public",
-        "src",
-        "dist",
-        ".git",
-        ".turbo",
-        "build",
-        ".next",
-        ".parcel-cache",
-        // not an album folder
-        "scripts",
-      ].includes(name),
-  );
+  .filter((name) => !name.startsWith("."));
 
 const bucket = env === "prod" ? "loftwahfm" : "loftwahfm-dev";
 if (!cache.objects) cache.objects = {};
@@ -53,6 +38,8 @@ function listFilesRecursive(dir) {
   return out;
 }
 
+const nodeBin = process.execPath;
+const wranglerBin = join(root, "node_modules", "wrangler", "bin", "wrangler.js");
 function sh(cmd) {
   execSync(cmd, { stdio: "inherit" });
 }
@@ -68,7 +55,7 @@ if (albumsOnDisk.length === 0) {
 console.log(`Syncing albums to R2 bucket: ${bucket}`);
 
 for (const slug of albumsOnDisk) {
-  const albumDir = join(root, slug);
+  const albumDir = join(mediaRoot, slug);
   try {
     const files = listFilesRecursive(albumDir);
     for (const file of files) {
@@ -89,9 +76,8 @@ for (const slug of albumsOnDisk) {
       // Upload
       // Upload
       const remoteFlag = useRemote ? " --remote" : "";
-      sh(
-        `npx --yes wrangler r2 object put${remoteFlag} "${bucket}/${key}" --file "${file}"`,
-      );
+      const putCmd = `${JSON.stringify(nodeBin)} ${JSON.stringify(wranglerBin)} r2 object put${remoteFlag} "${bucket}/${key}" --file "${file}"`;
+      sh(putCmd);
       cache.objects[key] = { size: st.size, mtimeMs: st.mtimeMs };
     }
   } catch (e) {

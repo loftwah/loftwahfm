@@ -29,3 +29,5 @@ pnpm-debug.log*
 
 # audio assets (keep locally, don't commit)
 *.mp3
+# local media workspace (kept out of git)
+music/

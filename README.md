@@ -5,7 +5,7 @@ Minimal, black & white, web‑first music player built with Astro + React, serve
 ### Overview
 
 - **Albums** are defined in `src/content/albums/*.yaml` and rendered on the homepage.
-- **Media files** (audio/video/cover images) live in root‑level folders named after each album’s `slug`. They are uploaded to R2 and streamed through `src/pages/media/[...key].ts`.
+- **Media files** (audio/video/cover images) live under `music/<album-slug>/...` locally (ignored by git). They are uploaded to R2 and streamed through `src/pages/media/[...key].ts`.
 - **Dev bucket**: `loftwahfm-dev` (used by preview). **Prod bucket**: `loftwahfm`.
 - **Node version**: `22` (see `.nvmrc`).
 
@@ -28,7 +28,7 @@ The preview uses `wrangler dev --remote` with `MEDIA` bound to `loftwahfm-dev`. 
 
 ## Add a new album
 
-1. Create a folder at the repository root with the album slug. Example: `future-classics/`.
+1. Create a folder at `music/` with the album slug. Example: `music/future-classics/`.
 
 Put files directly in this folder (no subdirectories):
 
@@ -60,7 +60,7 @@ tracks:
 
 - `npm run preview`
 
-The sync step uploads every file in each root‑level album folder to `loftwahfm-dev` under keys `<slug>/<filename>`. The UI will list the new album and stream media via `/media/<slug>/<file>`.
+The sync step uploads every file in each `music/<slug>/` folder to `loftwahfm-dev` under keys `<slug>/<filename>`. The UI will list the new album and stream media via `/media/<slug>/<file>`.
 
 4. Deploy when ready:
 
@@ -71,7 +71,7 @@ The sync step uploads every file in each root‑level album folder to `loftwahfm
 - `src/content.config.ts` defines the `albums` collection and schema. `src/pages/index.astro` loads all albums with `getCollection('albums')` and renders cards and the player.
 - `src/components/AlbumCard.tsx` and `src/components/Player.tsx` both fetch media via the `/media/` route so that R2 headers/range requests are handled properly.
 - `src/pages/media/[...key].ts` is an edge route that proxies R2, supports range requests, sets content type, and respects ETag/Last‑Modified.
-- `scripts/sync-r2.mjs` uploads the contents of each root‑level album folder to the appropriate R2 bucket. `npm run preview` calls `sync:dev` automatically; `npm run deploy` calls `sync:prod` first.
+- `scripts/sync-r2.mjs` uploads the contents of each `music/<slug>/` folder to the appropriate R2 bucket. `npm run preview` calls `sync:dev` automatically; `npm run deploy` calls `sync:prod` first.
 
 ## All Songs mode
 
@@ -123,7 +123,8 @@ Examples:
 - `src/components/AlbumCard.tsx`, `src/components/Player.tsx`: UI components.
 - `src/components/player/*`: player UI pieces.
 - `src/content/albums/*.yaml`: album definitions.
-- `scripts/sync-r2.mjs`: album file uploader (dev/prod).
+- `scripts/sync-r2.mjs`: album file uploader (dev/prod) from `music/`.
+- `scripts/pull-r2.mjs`: restore/download media from R2 into `music/`.
 - `wrangler.json`: bucket bindings; dev uses `loftwahfm-dev`, prod uses `loftwahfm`.
 - `.nvmrc`: Node 22.
 

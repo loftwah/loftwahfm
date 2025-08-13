@@ -38,6 +38,8 @@
     "sync:dev:force": "node scripts/sync-r2.mjs dev --force",
     "sync:prod": "node scripts/sync-r2.mjs prod",
     "sync:prod:force": "node scripts/sync-r2.mjs prod --force",
+    "pull:dev": "node scripts/pull-r2.mjs dev",
+    "pull:prod": "node scripts/pull-r2.mjs prod",
     "cf-typegen": "wrangler types",
     "check": "astro build && tsc && wrangler deploy --dry-run",
     "deploy": "npm run sync:prod && wrangler deploy",
