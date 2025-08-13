@@ -5,6 +5,9 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const env = process.argv[2] === "prod" ? "prod" : "dev";
+const forceUpload = process.argv.includes("--force") || process.argv.includes("-f");
+// Always target remote R2; allow opting out with --local
+const useRemote = !process.argv.includes("--local");
 const cachePath = join(
   root,
   env === "prod" ? ".r2-sync-cache.prod.json" : ".r2-sync-cache.dev.json",
@@ -31,6 +34,8 @@ const albumsOnDisk = readdirSync(root, { withFileTypes: true })
         "build",
         ".next",
         ".parcel-cache",
+        // not an album folder
+        "scripts",
       ].includes(name),
   );
 
@@ -52,6 +57,9 @@ function sh(cmd) {
   execSync(cmd, { stdio: "inherit" });
 }
 
+// Note: wrangler 4.21.x does not support `r2 object head` or listing.
+// We rely on a local change cache for skipping, and `--force` to override.
+
 if (albumsOnDisk.length === 0) {
   console.log("No album folders found to sync.");
   process.exit(0);
@@ -65,15 +73,25 @@ for (const slug of albumsOnDisk) {
     const files = listFilesRecursive(albumDir);
     for (const file of files) {
       const base = file.substring(file.lastIndexOf("/") + 1);
-      const key = `${bucket}/${slug}/${base}`;
+      // Upload to bucket root under <slug>/<filename>
+      const key = `${slug}/${base}`;
       const st = statSync(file);
       const prev = cache.objects[key];
-      if (prev && prev.size === st.size && prev.mtimeMs === st.mtimeMs) {
+      if (
+        !forceUpload &&
+        prev &&
+        prev.size === st.size &&
+        prev.mtimeMs === st.mtimeMs
+      ) {
         console.log(`Skip unchanged: ${key}`);
         continue;
       }
       // Upload
-      sh(`npx --yes wrangler r2 object put "${key}" --file "${file}"`);
+      // Upload
+      const remoteFlag = useRemote ? " --remote" : "";
+      sh(
+        `npx --yes wrangler r2 object put${remoteFlag} "${bucket}/${key}" --file "${file}"`,
+      );
       cache.objects[key] = { size: st.size, mtimeMs: st.mtimeMs };
     }
   } catch (e) {
