@@ -31,3 +31,5 @@ pnpm-debug.log*
 *.mp3
 # local media workspace (kept out of git)
 music/
+
+.venv/
