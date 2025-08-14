@@ -3,7 +3,7 @@ import type { AlbumData, TrackItem, VideoItem } from "./AlbumCard";
 import { TransportControls } from "./player/TransportControls";
 import { SeekBar } from "./player/SeekBar";
 import { VolumeControl } from "./player/VolumeControl";
-import { QueueList } from "./player/QueueList";
+import { QueueList, type QueueListItem } from "./player/QueueList";
 import { NowPlaying } from "./player/NowPlaying";
 
 type QueueItem =
@@ -249,7 +249,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
       } catch {}
     } catch {}
   };
-  const addToPlaylist = (item: QueueItem) => {
+  const addToPlaylist = (item: QueueListItem) => {
     try {
       const raw = localStorage.getItem("lfm.playlist");
       const items = raw ? (JSON.parse(raw).items as QueueItem[]) || [] : [];
@@ -258,7 +258,7 @@ export default function Player({ albums }: { albums: AlbumData[] }) {
       const next =
         last && last.file === item.file && last.albumSlug === item.albumSlug
           ? items
-          : [...items, item];
+          : [...items, item as any];
       persistPlaylist(next);
     } catch {}
   };
