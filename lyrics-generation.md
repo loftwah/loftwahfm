@@ -51,33 +51,32 @@ uv pip install openai-whisper
 
 ---
 
-## 5) Generate an `.lrc` file for a single track
+## 5) Generate an `.lrc` file for a single track (via SRT → LRC)
 
-Pick one song (example uses Phantom Love):
+Whisper does not output LRC directly. Generate SRT, then convert to LRC using `scripts/srt2lrc.py`.
 
 ```bash
 TEST_SONG="/home/loftwah/gits/loftwahfm/music/phantom-love/Phantom Love.mp3"
 OUT_DIR="$(dirname "$TEST_SONG")"
+BASENAME="$(basename "$TEST_SONG" .mp3)"
 
+# 1) Generate SRT next to the MP3
 .venv/bin/whisper "$TEST_SONG" \
   --model medium \
-  --output_format lrc \
+  --output_format srt \
   --output_dir "$OUT_DIR"
+
+# Whisper may include a language code, handle both
+SRT_FILE=""
+if [ -f "$OUT_DIR/$BASENAME.srt" ]; then SRT_FILE="$OUT_DIR/$BASENAME.srt"; fi
+if [ -z "$SRT_FILE" ] && [ -f "$OUT_DIR/$BASENAME.en.srt" ]; then SRT_FILE="$OUT_DIR/$BASENAME.en.srt"; fi
+if [ -z "$SRT_FILE" ]; then echo "No .srt found for $TEST_SONG" && exit 1; fi
+
+# 2) Convert SRT -> LRC next to the MP3
+python3 scripts/srt2lrc.py "$SRT_FILE" -o "$OUT_DIR/$BASENAME.lrc"
 ```
 
-Notes:
-
-- Models: `base`, `small`, `medium`, `large`. `medium` is a good balance; change as needed.
-- Whisper may emit `.en.lrc` (language code). If your app expects exact basename, normalize it:
-
-```bash
-BASE_NOEXT="$(basename "$TEST_SONG" .mp3)"
-if [ -f "$OUT_DIR/$BASE_NOEXT.en.lrc" ] && [ ! -f "$OUT_DIR/$BASE_NOEXT.lrc" ]; then
-  cp "$OUT_DIR/$BASE_NOEXT.en.lrc" "$OUT_DIR/$BASE_NOEXT.lrc"
-fi
-```
-
-After running, the `.lrc` should sit next to the `.mp3` in the same album folder.
+After running, the `.lrc` will sit next to the `.mp3` in the same album folder.
 
 ---
 
@@ -90,16 +89,22 @@ ROOT="/home/loftwah/gits/loftwahfm/music"
 find "$ROOT" -type f -name '*.mp3' | while read -r mp3; do
   dir="$(dirname "$mp3")"
   base_noext="$(basename "$mp3" .mp3)"
-  # Skip if either basename.lrc or basename.en.lrc already exists
-  if [ -f "$dir/$base_noext.lrc" ] || [ -f "$dir/$base_noext.en.lrc" ]; then
+
+  # Skip if LRC already exists
+  if [ -f "$dir/$base_noext.lrc" ]; then
     echo "Skip existing: $mp3"; continue
   fi
-  echo "Generating LRC: $mp3"
-  .venv/bin/whisper "$mp3" --model medium --output_format lrc --output_dir "$dir"
-  # Normalize to basename.lrc if only language-suffixed file exists
-  if [ -f "$dir/$base_noext.en.lrc" ] && [ ! -f "$dir/$base_noext.lrc" ]; then
-    cp "$dir/$base_noext.en.lrc" "$dir/$base_noext.lrc"
-  fi
+
+  echo "Generating SRT: $mp3"
+  .venv/bin/whisper "$mp3" --model medium --output_format srt --output_dir "$dir"
+
+  srt=""
+  if [ -f "$dir/$base_noext.srt" ]; then srt="$dir/$base_noext.srt"; fi
+  if [ -z "$srt" ] && [ -f "$dir/$base_noext.en.srt" ]; then srt="$dir/$base_noext.en.srt"; fi
+  if [ -z "$srt" ]; then echo "No SRT produced for $mp3"; continue; fi
+
+  echo "Converting to LRC: $mp3"
+  python3 scripts/srt2lrc.py "$srt" -o "$dir/$base_noext.lrc"
 done
 ```
 
