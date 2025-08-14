@@ -451,6 +451,30 @@
     "thrash/lyrics.txt": {
       "size": 2320,
       "mtimeMs": 1755148593644.1157
+    },
+    "readme/README (Korny Remix).mp3": {
+      "size": 5169719,
+      "mtimeMs": 1755179691408.4436
+    },
+    "readme/README (Lo-fi Remix).mp3": {
+      "size": 5396294,
+      "mtimeMs": 1755179603585.1187
+    },
+    "readme/README (NES Remix).mp3": {
+      "size": 5311723,
+      "mtimeMs": 1755179700131.807
+    },
+    "readme/README.mp3": {
+      "size": 4509360,
+      "mtimeMs": 1755179448461.3865
+    },
+    "readme/cover.jpg": {
+      "size": 137378,
+      "mtimeMs": 1755178660493.9436
+    },
+    "readme/lyrics.txt": {
+      "size": 2815,
+      "mtimeMs": 1755179760011.5564
     }
   }
 }

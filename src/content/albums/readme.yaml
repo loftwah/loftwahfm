@@ -1,0 +1,16 @@
+slug: readme
+title: README
+artist: Loftwah
+year: 2025
+cover: cover.jpg
+tracks:
+  - title: README
+    file: README.mp3
+  - title: README (Korny Remix)
+    file: README (Korny Remix).mp3
+  - title: README (Lo-fi Remix)
+    file: README (Lo-fi Remix).mp3
+  - title: README (NES Remix)
+    file: README (NES Remix).mp3
+
+
