@@ -1,0 +1,22 @@
+slug: my-penguin
+title: My Penguin
+artist: Loftwah
+year: 2025
+cover: cover.jpg
+tracks:
+  - title: My Penguin
+    file: My Penguin.mp3
+  - title: My Penguin (Arcade Remix)
+    file: My Penguin (Arcade Remix).mp3
+  - title: My Penguin (Boom Bap Remix)
+    file: My Penguin (Boom Bap Remix).mp3
+  - title: My Penguin (Head Nodder Remix)
+    file: My Penguin (Head Nodder Remix).mp3
+  - title: My Penguin (Jazz Club Remix)
+    file: My Penguin (Jazz Club Remix).mp3
+  - title: My Penguin (Retro Remix)
+    file: My Penguin (Retro Remix).mp3
+  - title: My Penguin (SNES Remix)
+    file: My Penguin (SNES Remix).mp3
+
+
