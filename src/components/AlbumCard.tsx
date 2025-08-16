@@ -126,13 +126,12 @@ export function AlbumCard({
           loading="lazy"
         />
       </div>
-      <div className="p-3 flex-1 flex flex-col"
-      >
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-semibold text-white">{album.title}</h3>
-          <span className="text-xs text-white/60">{album.year}</span>
+      <div className="p-3 flex-1 flex flex-col">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="flex-1 min-w-0 truncate text-sm sm:text-base font-semibold text-white">{album.title}</h3>
+          <span className="text-xs text-white/60 flex-shrink-0">{album.year}</span>
         </div>
-        <p className="text-sm text-white/80">{album.artist || "Loftwah"}</p>
+        <p className="text-xs sm:text-sm text-white/80 truncate">{album.artist || "Loftwah"}</p>
         <p className="text-xs text-white/60 flex items-center gap-3">
           <span className="inline-flex items-center gap-1">
             <Music2 size={12} />
